@@ -1,0 +1,88 @@
+"use client";
+import Image from "next/image";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+} from "@/components/ui/sidebar";
+import { usePathname } from "next/navigation";
+import Link from "next/link";
+import { menuItems, UserRole } from "@/config/menuConfig";
+import { selectCurrentUser } from "@/redux/features/auth/authSlice";
+import { useAppSelector } from "@/redux/hook";
+
+export function AppSidebar() {
+  const pathname = usePathname();
+  const user = useAppSelector(selectCurrentUser);
+  const role: UserRole = user?.role ?? "user";
+  const items = menuItems[role];
+
+  return (
+    <Sidebar className="border-none flex flex-col h-screen">
+      <div className="bg-[#ffffff] flex flex-col h-full">
+        {/* Fixed Logo Section */}
+        <div className="pt-5 mb-20 flex justify-center shrink-0">
+          <Link href="/">
+            <Image
+              src="/dashboard/logo.svg"
+              alt="Dashboard Logo"
+              height={44}
+              width={226}
+              className="block"
+            />
+          </Link>
+        </div>
+
+        {/* Scrollable Menu */}
+        <SidebarContent
+          className="flex-1 max-h-[800px] overflow-y-auto p-0 !scrollbar-thin !scrollbar-thumb-[#0096FF] !scrollbar-track-transparent"
+          style={{
+            scrollbarWidth: "thin",
+            scrollbarColor: "#0096FF transparent",
+          }}
+        >
+          <SidebarGroup className="p-0">
+            <SidebarGroupContent>
+              <SidebarMenu className="gap-4">
+                {items.map((item) => (
+                  <SidebarMenuItem
+                    key={item.title}
+                    className={`relative px-5 py-2 transition-colors rounded-none before:absolute before:left-1 before:top-0 before:h-full before:w-2 before:bg-[#ffffff] ${
+                      (
+                        item.url === "/dashboard"
+                          ? pathname === "/dashboard" ||
+                            (pathname.startsWith("/dashboard/") &&
+                              !items.some(
+                                (i) =>
+                                  i.url !== "/dashboard" &&
+                                  pathname.startsWith(i.url),
+                              ))
+                          : pathname === item.url
+                      )
+                        ? "bg-[#0096FF] text-white hover:text-white before:block"
+                        : "text-[#090D15] hover:bg-[#0096FF] hover:text-white before:hidden hover:before:block"
+                    }`}
+                  >
+                    <SidebarMenuButton asChild>
+                      <Link
+                        href={item.url}
+                        className="flex items-center gap-2 hover:text-white p-0! bg-transparent! !hover:bg-transparent focus-visible:shadow-none active:text-white"
+                      >
+                        <item.icon className="h-5 w-5" />
+                        <span>{item.title}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        </SidebarContent>
+      </div>
+    </Sidebar>
+  );
+}
