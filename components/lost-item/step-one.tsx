@@ -271,7 +271,7 @@ function ConfirmedView({ onChange }: { onChange: () => void }) {
 
 export function SearchView({ onManual }: { onManual: () => void }) {
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const { form } = useLostItemForm();
+  const { form, actions } = useLostItemForm();
   const params = useParams();
   const itemTypesId = (params.id as string)?.toLowerCase();
   const location = form.watch("location");
@@ -296,6 +296,7 @@ export function SearchView({ onManual }: { onManual: () => void }) {
     setValue("countryCode", loc.countryCode);
     setValue("placeName", loc.name);
     setShowSuggestions(false);
+    actions.setView("confirmed");
   };
 
   return (

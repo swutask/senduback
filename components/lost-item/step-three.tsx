@@ -23,6 +23,8 @@ import {
   IconBadge,
   IconInput,
   Input,
+  LinkButton,
+  SearchBar,
   StepHeader,
   TwoCol,
 } from "./common";
@@ -38,6 +40,8 @@ import {
 } from "@/redux/features/shipping/shippingApi";
 import FormFooter from "./form-footer";
 import { useParams } from "next/navigation";
+import { CountrySelect } from "./country-select";
+import { Controller } from "react-hook-form";
 
 const RECENT_ADDRESSES_KEY = "recent_delivery_addresses";
 const MAX_RECENT = 5;
@@ -72,11 +76,142 @@ function saveRecentAddress(addr: RecentAddress) {
   } catch {}
 }
 
+const addressFields = [
+  "sendAddress",
+  "sendStreet",
+  "sendCountry",
+  "sendState",
+  "sendCity",
+  "sendPostalCode",
+  "sendCountryCode",
+];
+
+function ManualView({
+  onSearch,
+  onConfirm,
+}: {
+  onSearch: () => void;
+  onConfirm: () => void;
+}) {
+  const { form } = useLostItemForm();
+  const {
+    register,
+    formState: { errors },
+  } = form;
+
+  const handleConfirm = async () => {
+    // @ts-ignore
+    const isValid = await form.trigger(addressFields);
+
+    if (!isValid) return;
+
+    const values = form.getValues();
+
+    const recent: RecentAddress = {
+      name: values.sendAddress || "",
+      street: values.sendStreet || "",
+      city: values.sendCity || "",
+      state: values.sendState || "",
+      country: values.sendCountry || "",
+      postalCode: values.sendPostalCode || "",
+      countryCode: values.sendCountryCode || "",
+    };
+
+    saveRecentAddress(recent);
+
+    onConfirm();
+  };
+
+  return (
+    <motion.div
+      variants={fadeUp}
+      initial="hidden"
+      animate="visible"
+      exit="exit"
+      className="space-y-3"
+    >
+      <SearchBar
+        placeholder={"Search for your address"}
+        readOnly
+        onClick={onSearch}
+      />
+      <div className="text-center">
+        <LinkButton onClick={onSearch}>Search instead</LinkButton>
+      </div>
+
+      <Card className="p-5 sm:p-6 space-y-4">
+        <Field label="Place Name" error={errors.sendAddress?.message}>
+          <Input
+            {...register("sendAddress", {
+              required: "Place Name is required",
+            })}
+            placeholder="Enter Place Name"
+          />
+        </Field>
+
+        <Field label="Street Address" error={errors.sendStreet?.message}>
+          <Input
+            {...register("sendStreet", {
+              required: "Street address is required",
+            })}
+            placeholder="Enter street address"
+          />
+        </Field>
+
+        <TwoCol mobileLayout="twoCol">
+          <Field label="City" error={errors.sendCity?.message}>
+            <Input {...register("sendCity")} placeholder="Enter city" />
+          </Field>
+          <Field label="State / Region" error={errors.sendState?.message}>
+            <Input
+              {...register("sendState", { required: "State is required" })}
+              placeholder="Enter state"
+            />
+          </Field>
+        </TwoCol>
+
+        <TwoCol mobileLayout="twoCol">
+          <Field label="Country" error={errors.sendCountryCode?.message}>
+            <Controller
+              name="sendCountryCode"
+              control={form.control}
+              rules={{ required: "Country is required" }}
+              render={({ field }) => (
+                <CountrySelect
+                  value={field.value}
+                  onChange={(code, label) => {
+                    field.onChange(code);
+                    form.setValue("sendCountry", label);
+                  }}
+                  error={errors.sendCountryCode?.message}
+                />
+              )}
+            />
+          </Field>
+
+          <Field label="Postcode" error={errors.sendPostalCode?.message}>
+            <Input
+              {...register("sendPostalCode", {
+                required: "Postcode is required",
+              })}
+              placeholder="Enter postcode"
+            />
+          </Field>
+        </TwoCol>
+
+        <GradientButton onClick={handleConfirm}>
+          Confirm Location
+        </GradientButton>
+      </Card>
+    </motion.div>
+  );
+}
+
 function AddressSelectView({ onSelect }: { onSelect: () => void }) {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [selected, setSelected] = useState<string | null>(null);
   const [recentAddresses, setRecentAddresses] = useState<RecentAddress[]>([]);
-  const { form } = useLostItemForm();
+  const { form, actions } = useLostItemForm();
   const address = form.watch("sendAddress");
 
   const { data, isLoading } = useSearchLocationsQuery(
@@ -87,6 +222,10 @@ function AddressSelectView({ onSelect }: { onSelect: () => void }) {
   useEffect(() => {
     setRecentAddresses(getRecentAddresses());
   }, []);
+
+  const handleManual = () => {
+    actions.setView("manual");
+  };
 
   const applyLocation = (loc: {
     name: string;
@@ -186,6 +325,12 @@ function AddressSelectView({ onSelect }: { onSelect: () => void }) {
             )}
           </div>
         )}
+      </div>
+
+      <div className="mt-4 text-center">
+        <LinkButton onClick={handleManual}>
+          Can't find it? Add location manually
+        </LinkButton>
       </div>
 
       {recentAddresses.length > 0 && (
@@ -509,6 +654,16 @@ export default function DeliveryStep() {
               <AddressSelectView
                 key="select"
                 onSelect={() => actions.setView("recipient")}
+              />
+            )}
+
+            {state.view === "manual" && (
+              <ManualView
+                key="manual"
+                onSearch={() => actions.setView("select")}
+                onConfirm={() => {
+                  actions.setView("recipient");
+                }}
               />
             )}
 

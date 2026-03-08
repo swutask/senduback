@@ -390,7 +390,7 @@ export default function ItemDetailsStep() {
       return;
     }
 
-    if (form.watch("sendAddress")) {
+    if (form.watch("sendAddress") && form.watch("sendStreet")) {
       actions.goToStep("delivery");
       actions.setView("recipient");
       return;

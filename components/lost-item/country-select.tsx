@@ -11,7 +11,7 @@ interface CountrySelectProps {
   error?: string;
 }
 
-export function CountrySelect({ value, onChange, error }: CountrySelectProps) {
+export function CountrySelect({ value, onChange }: CountrySelectProps) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
   const containerRef = useRef<HTMLDivElement>(null);
@@ -65,9 +65,7 @@ export function CountrySelect({ value, onChange, error }: CountrySelectProps) {
           "w-full h-11 rounded-xl border bg-white px-3 py-2 text-sm text-left flex items-center justify-between gap-2 transition-all",
           open
             ? "border-[#1D6FF2] ring-2 ring-[#1D6FF2]/20"
-            : error
-              ? "border-red-400"
-              : "border-input hover:border-slate-300",
+            : "border-input hover:border-slate-300",
         )}
       >
         {selected ? (

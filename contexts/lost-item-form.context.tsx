@@ -54,7 +54,7 @@ export type FormAction =
 const STEP_ALLOWED_VIEWS: Record<FormStep, ViewState[]> = {
   location: ["search", "manual", "confirmed"],
   "item-details": ["category", "item-list"],
-  delivery: ["select", "recipient", "confirmed"],
+  delivery: ["select", "recipient", "manual", "confirmed"],
   shipping: ["loading", "select", "confirmed"],
 };
 
