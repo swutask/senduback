@@ -151,7 +151,7 @@ function CTAButtons({
         </motion.button>
       </Link>
 
-      <Link href={"/"} className="w-full">
+      <Link href={"/for-hotels"} className="w-full">
         <motion.button
           whileHover={{ scale: 1.03, transition: { duration: 0.18 } }}
           whileTap={{ scale: 0.97 }}
