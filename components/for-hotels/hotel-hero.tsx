@@ -108,7 +108,7 @@ export default function HotelHero() {
               variants={fadeUpVariants}
               className="flex flex-col sm:flex-row gap-4 w-full pt-2"
             >
-              <Link href="/register" className="w-full sm:w-auto">
+              <Link href="/signup" className="w-full sm:w-auto">
                 <Button className={primaryBtnClasses}>Register Business</Button>
               </Link>
 
