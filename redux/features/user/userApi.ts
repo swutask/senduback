@@ -19,10 +19,12 @@ export const userApi = baseApi.injectEndpoints({
       }) => `/user?role=${role}&page=${page}&limit=${limit}`,
       providesTags: ["User"],
     }),
+
     getUserById: builder.query({
       query: (id: string) => `/user/${id}`,
       providesTags: (result, error, id) => [{ type: "User", id }],
     }),
+
     updateUserProfile: builder.mutation({
       query: (userData: FormData | Record<string, any>) => {
         const isFormData = userData instanceof FormData;
@@ -33,6 +35,7 @@ export const userApi = baseApi.injectEndpoints({
           ...(isFormData && { formData: true }),
         };
       },
+
       invalidatesTags: ["User"],
     }),
   }),

@@ -154,15 +154,15 @@ export default function FAQSection() {
                 Frequently asked questions
               </h1>
               <div className="w-24 h-3 relative py-5">
-                <div className="w-16 h-3 left-6 top-0 absolute bg-gradient-to-br from-sky-500 via-sky-600 to-sky-100 rounded-2xl" />
-                <div className="w-3 h-3 left-0 top-0 absolute bg-gradient-to-br from-sky-500 via-sky-600 to-sky-100 rounded-full" />
+                <div className="w-16 h-3 left-6 top-0 absolute bg-linear-to-br from-sky-500 via-sky-600 to-sky-100 rounded-2xl" />
+                <div className="w-3 h-3 left-0 top-0 absolute bg-linear-to-br from-sky-500 via-sky-600 to-sky-100 rounded-full" />
               </div>
               {pathname === "/faq" ? (
                 ""
               ) : (
                 <Link href={"/faq"}>
                   <Button
-                    className="flex items-center gap-4 text-white  !px-10 py-6 md:py-8 rounded-2xl bg-gradient-to-b from-[#0096FF] to-[#006CD8] hover:from-[#006CD8] hover:to-[#0096FF] hover:text-white hover:scale-105 ease-in"
+                    className="flex items-center gap-4 text-white px-10! py-6 md:py-8 rounded-2xl bg-linear-to-b from-[#0096FF] to-[#006CD8] hover:from-[#006CD8] hover:to-[#0096FF] hover:text-white hover:scale-105 ease-in"
                     variant={"ghost"}
                     style={{
                       boxShadow: "0px 40px 70px rgba(0, 150, 255, 0.2)",

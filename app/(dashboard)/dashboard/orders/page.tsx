@@ -1,5 +1,21 @@
 "use client";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Table,
   TableBody,
@@ -8,417 +24,785 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ChevronLeft, ChevronRight, Download, Eye } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import ShippingDetailsModal from "@/lib/modal/shipping-details-modal";
+import { useGetAllBusinessUsersQuery } from "@/redux/features/lostItem/lostitemApi";
+import {
+  useCreateShippingInfoMutation,
+  useGetShippingsQuery,
+} from "@/redux/features/shipping/shippingApi";
+import {
+  Calendar,
+  ChevronDown,
+  Download,
+  Search,
+  Upload,
+  X,
+} from "lucide-react";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { useGetShippingsQuery } from "@/redux/features/shipping/shippingApi";
-import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
-const BusinessOrdersPage = () => {
-  const router = useRouter();
+// Helper function to get item image based on item type
+const getItemImage = (itemType: string) => {
+  switch (itemType?.toLowerCase()) {
+    case "laptop":
+      return "💻";
+    case "smartphone":
+      return "📱";
+    case "keys":
+      return "🔑";
+    case "watch":
+      return "⌚";
+    case "passport":
+      return "📕";
+    case "wallet":
+      return "👛";
+    case "jewelry":
+      return "📿";
+    case "scarf":
+      return "🧣";
+    case "jacket":
+      return "🧥";
+    case "headphone":
+      return "🎧";
+    case "sunglasses":
+      return "🕶️";
+    case "tablet":
+      return "📱";
+    default:
+      return "📦";
+  }
+};
+
+// Helper to get label status
+const getLabelStatus = (shipment: any) => {
+  if (shipment.shippingLabel) return "Uploaded";
+  return "Waiting for label";
+};
+
+export default function OrdersPage() {
+  const pathname = usePathname();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [businessFilter, setBusinessFilter] = useState("all");
+  const [dateRange, setDateRange] = useState({ from: "", to: "" });
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [selectedItem, setSelectedItem] = useState<any>(null);
+  const [businessSearch, setBusinessSearch] = useState("");
+  const [showBusinessDropdown, setShowBusinessDropdown] = useState(false);
+  const [showDateRange, setShowDateRange] = useState(false);
 
-  // Use the API to fetch shippings
-  const {
-    data: shippingData,
-    isLoading,
-    isError,
-  } = useGetShippingsQuery({
-    page: currentPage,
-    limit: itemsPerPage,
-    // status: "shipped",
+  // Add these states at the top with other states
+  const [showLabelModal, setShowLabelModal] = useState(false);
+  const [selectedShipmentForLabel, setSelectedShipmentForLabel] =
+    useState<any>(null);
+  const [shippingLabelFile, setShippingLabelFile] = useState<File | null>(null);
+  const [isUploadingLabel, setIsUploadingLabel] = useState(false);
+  const [trackingId, setTrackingId] = useState("");
+  const [trackingUrl, setTrackingUrl] = useState("");
+  const [carrier, setCarrier] = useState("");
+
+  const [createShippingInfo] = useCreateShippingInfoMutation();
+
+  // Fetch business users data
+  const { data: businessUsersData } = useGetAllBusinessUsersQuery({
+    searchTerm: businessSearch.trim() || undefined,
   });
+  const businessUsers = businessUsersData?.data || [];
 
-  console.log(shippingData);
+  // Build query params - ONLY show paymentCompleted status
+  const buildQueryParams = () => {
+    const params: any = {
+      page: currentPage,
+      limit: pathname === "/dashboard" ? 6 : rowsPerPage,
+      // status: ["paymentCompleted"],
+    };
 
-  // Extract data from API response
-  const shippings = shippingData?.data?.shippings || [];
-  const meta = shippingData?.data?.meta || {
+    // Add search term
+    if (searchTerm) {
+      params.searchTerm = searchTerm;
+    }
+
+    // Add business filter - send business email
+    if (businessFilter !== "all") {
+      const selectedBusiness = businessUsers.find(
+        (business: any) => business._id === businessFilter,
+      );
+      if (selectedBusiness?.email) {
+        params.fromEmail = selectedBusiness.email;
+      }
+    }
+
+    // Add date range filter
+    if (dateRange.from && dateRange.to) {
+      params.from = dateRange.from;
+      params.to = dateRange.to;
+    }
+
+    return params;
+  };
+
+  const { data: shipmentsData, isLoading } =
+    useGetShippingsQuery(buildQueryParams());
+
+  const shipments =
+    shipmentsData?.data?.shippings?.filter(
+      (shipment: any) => !shipment.shippingLabel,
+    ) || [];
+
+  console.log("shipmentsData", shipments);
+
+  const meta = shipmentsData?.data?.meta || {
     total: 0,
     limit: 10,
     page: 1,
     totalPage: 1,
   };
 
-  const totalItems = meta.total;
-  const totalPages = meta.totalPage;
-
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-
-  // Format date to DD/MM/YYYY
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    const day = date.getDate().toString().padStart(2, "0");
-    const month = (date.getMonth() + 1).toString().padStart(2, "0");
-    const year = date.getFullYear();
-    return `${day}/${month}/${year}`;
-  };
-
-  // Format currency
-  const formatCurrency = (amount: number) => {
-    if (!amount && amount !== 0) return "N/A";
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(amount);
-  };
-
-  // Get payment status
-  const getPaymentStatus = (status: string) => {
-    if (!status) return "Pending";
-    switch (status.toLowerCase()) {
-      case "paymentcompleted":
-        return "Paid";
-      case "shipped":
-        return "Shipped";
-      case "rateselected":
-        return "Awaiting payment";
-      case "created":
-        return "Pending";
-      default:
-        return status;
+  const handleDateRangeApply = () => {
+    if (dateRange.from && dateRange.to) {
+      setCurrentPage(1);
     }
   };
 
-  // Get shipping label status
-  const getShippingLabelStatus = (shipping: any) => {
-    if (shipping.shippingLabel) return "Label generated";
-    if (shipping.status === "created" || shipping.status === "rateSelected")
-      return "Pending";
-    return "Waiting for label";
+  const clearFilters = () => {
+    setBusinessFilter("all");
+    setDateRange({ from: "", to: "" });
+    setSearchTerm("");
+    setCurrentPage(1);
+    setBusinessSearch("");
   };
 
-  // Get price breakdown
-  // const getPriceBreakdown = (shipping: any) => {
-  //     const shippingCost = shipping.shipping_cost || 0;
-  //     const insuranceCost = shipping.insurance?.insuranceCost || 0;
-  //     const totalCost = shipping.total_cost || 0;
-  //     const serviceCost = totalCost - shippingCost - insuranceCost;
+  // Get selected business name
+  const getSelectedBusinessName = () => {
+    if (businessFilter === "all") return "Business";
+    const selectedBusiness = businessUsers.find(
+      (business: any) => business._id === businessFilter,
+    );
+    return selectedBusiness?.businessName || "Business";
+  };
 
-  //     let breakdown = `Service: ${formatCurrency(serviceCost)}\nShipping: ${formatCurrency(shippingCost)}`;
-  //     if (insuranceCost > 0) {
-  //         breakdown += `\nInsurance: ${formatCurrency(insuranceCost)}`;
-  //     }
-  //     return breakdown;
-  // };
+  const handleOpenLabelModal = (shipment: any) => {
+    setSelectedShipmentForLabel(shipment);
+    setShippingLabelFile(null);
+    setTrackingId(shipment.tracking_id || "");
+    setTrackingUrl(shipment.tracking_url || "");
+    setCarrier(shipment.carrier || "");
+    setShowLabelModal(true);
+  };
 
-  const [downloadingId, setDownloadingId] = useState<string | null>(null);
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setShippingLabelFile(e.target.files[0]);
+    }
+  };
 
-  const handleDownloadLabelFetch = async (
-    shippingLabel: string,
-    shipmentId: string,
-  ) => {
-    setDownloadingId(shipmentId);
+  const handleUploadLabel = async () => {
+    if (!selectedShipmentForLabel || !shippingLabelFile) return;
+
     try {
-      const baseUrl =
-        process.env.NEXT_PUBLIC_BASEURL || "http://10.10.7.26:5001";
-      const labelUrl = `${baseUrl}${shippingLabel}`;
+      setIsUploadingLabel(true);
 
-      const response = await fetch(labelUrl);
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
+      // Create tracking data with user inputs
+      const trackingData = {
+        tracking_id: trackingId || "",
+        tracking_url: trackingUrl || "",
+        carrier: carrier || "",
+      };
 
-      const link = document.createElement("a");
-      link.href = url;
-      const filename =
-        shippingLabel.split("/").pop() || `shipping-label-${Date.now()}.png`;
-      link.download = filename;
+      await createShippingInfo({
+        id: selectedShipmentForLabel._id,
+        trackingData,
+        shippingLabel: shippingLabelFile,
+      }).unwrap();
 
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      setShowLabelModal(false);
+      setSelectedShipmentForLabel(null);
+      setShippingLabelFile(null);
+      setTrackingId("");
+      setTrackingUrl("");
+      setCarrier("");
 
-      window.URL.revokeObjectURL(url);
+      toast.success(
+        "Shipping label and tracking details uploaded successfully!",
+      );
     } catch (error) {
-      console.error("Error downloading label:", error);
-      const baseUrl =
-        process.env.NEXT_PUBLIC_BASEURL || "http://10.10.7.26:5001";
-      window.open(`${baseUrl}${shippingLabel}`, "_blank");
+      console.error("Failed to upload label:", error);
+      toast.error("Failed to upload shipping label");
     } finally {
-      setDownloadingId(null);
+      setIsUploadingLabel(false);
     }
   };
-
-  const getPageNumbers = () => {
-    const pages = [];
-    pages.push(1);
-
-    if (currentPage > 3) {
-      pages.push("...");
-    }
-
-    for (
-      let i = Math.max(2, currentPage - 1);
-      i <= Math.min(totalPages - 1, currentPage + 1);
-      i++
-    ) {
-      if (i !== 1 && i !== totalPages) {
-        pages.push(i);
-      }
-    }
-
-    if (currentPage < totalPages - 2) {
-      pages.push("...");
-    }
-
-    if (totalPages > 1) {
-      pages.push(totalPages);
-    }
-
-    return pages;
-  };
-
-  const pageNumbers = getPageNumbers();
-
-  const handlePrevious = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    }
-  };
-
-  const handleNext = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
-    }
-  };
-
-  const handlePageClick = (page: number) => {
-    if (page !== currentPage) {
-      setCurrentPage(page);
-    }
-  };
-
-  if (isLoading) {
-    return (
-      <div className="p-6 space-y-6">
-        <Card className="shadow-[0_4px_4px_0_rgba(0,0,0,0.12)]">
-          <CardHeader>
-            <div className="flex items-start justify-between">
-              <div>
-                <CardTitle className="text-xl font-semibold text-gray-900">
-                  Orders List
-                </CardTitle>
-                <p className="text-sm text-gray-600 mt-1">
-                  See all guest orders linked to your lost items.
-                </p>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-center py-8 text-gray-500">
-              Loading orders...
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
-  if (isError) {
-    return (
-      <div className="p-6 space-y-6">
-        <Card className="shadow-[0_4px_4px_0_rgba(0,0,0,0.12)]">
-          <CardHeader>
-            <div className="flex items-start justify-between">
-              <div>
-                <CardTitle className="text-xl font-semibold text-gray-900">
-                  Orders List
-                </CardTitle>
-                <p className="text-sm text-gray-600 mt-1">
-                  See all guest orders linked to your lost items.
-                </p>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-center py-8 text-gray-500">
-              Error loading orders. Please try again.
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
 
   return (
-    <div className="p-6 space-y-6">
-      {/* Orders Table Section */}
-      <Card className="shadow-[0_4px_4px_0_rgba(0,0,0,0.12)]">
-        <CardHeader>
-          <div className="flex items-start justify-between">
-            <div>
-              <CardTitle className="text-xl font-semibold text-gray-900">
-                Orders List
-              </CardTitle>
-              <p className="text-sm text-gray-600 mt-1">
-                See all guest orders linked to your lost items.
-              </p>
+    <div className="w-[92vw] md:w-[770px] lg:w-full mx-auto lg:mx-0">
+      {/* Header */}
+      <div className="mb-6">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <div className="flex items-center gap-3 mb-1">
+              <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                <span className="text-blue-600">📦</span>
+              </div>
+              <h1 className="text-2xl font-semibold text-gray-900">Orders</h1>
             </div>
+            <p className="text-sm text-gray-600">
+              All paid orders awaiting shipment
+            </p>
           </div>
-        </CardHeader>
-        <CardContent>
-          <div className="overflow-x-auto border border-[#454B6066] rounded-lg">
-            <Table>
-              <TableHeader>
-                <TableRow className="border-b border-[#454B6066] bg-[#EAEAEA] hover:bg-[#EAEAEA]">
-                  <TableHead className="text-sm font-bold text-gray-600 py-3">
-                    Order ID
-                  </TableHead>
-                  <TableHead className="text-sm font-bold text-gray-600 py-3">
-                    Guest
-                  </TableHead>
-                  <TableHead className="text-sm font-bold text-gray-600 py-3">
-                    Created On
-                  </TableHead>
-                  <TableHead className="text-sm font-bold text-gray-600 py-3">
-                    Payment Status
-                  </TableHead>
-                  <TableHead className="text-sm font-bold text-gray-600 py-3">
-                    Shipping Label
-                  </TableHead>
-                  <TableHead className="text-sm font-bold text-gray-600 py-3">
-                    Courier
-                  </TableHead>
-                  {/* <TableHead className="text-sm font-bold text-gray-600 py-3">Price breakdown</TableHead> */}
-                  <TableHead className="text-sm font-bold text-gray-600 py-3">
-                    Actions
-                  </TableHead>
-                  <TableHead className="text-sm font-bold text-gray-600 py-3">
-                    View
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {shippings.map((shipping: any, index: number) => (
-                  <TableRow
-                    key={shipping._id}
-                    className="border-b border-[#454B6066] hover:bg-gray-50 transition-colors last:border-b-0"
+        </div>
+      </div>
+
+      {/* Search */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 mb-4 p-4">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+          <Input
+            placeholder="Search by order ID, item name, business, or guest..."
+            value={searchTerm}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              setCurrentPage(1);
+            }}
+            className="pl-10 py-2.5"
+          />
+        </div>
+      </div>
+
+      {/* Filters */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 mb-6 p-4">
+        <div className="flex flex-wrap items-center gap-3">
+          {/* Date Range Filter */}
+          <DropdownMenu open={showDateRange} onOpenChange={setShowDateRange}>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="gap-2">
+                📅{" "}
+                {dateRange.from && dateRange.to
+                  ? `${dateRange.from} to ${dateRange.to}`
+                  : "Date Range"}
+                <Calendar className="w-4 h-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-64 p-4" align="start">
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    From
+                  </label>
+                  <input
+                    type="date"
+                    value={dateRange.from}
+                    onChange={(e) =>
+                      setDateRange({ ...dateRange, from: e.target.value })
+                    }
+                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    To
+                  </label>
+                  <input
+                    type="date"
+                    value={dateRange.to}
+                    onChange={(e) =>
+                      setDateRange({ ...dateRange, to: e.target.value })
+                    }
+                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  />
+                </div>
+                <div className="flex gap-2 pt-2">
+                  <Button
+                    size="sm"
+                    className="flex-1"
+                    onClick={() => {
+                      handleDateRangeApply();
+                      setShowDateRange(false);
+                    }}
+                    disabled={!dateRange.from || !dateRange.to}
                   >
-                    <TableCell className="text-sm text-gray-900 py-3">
-                      {(startIndex + index + 1).toString().padStart(2, "0")}
-                    </TableCell>
-                    <TableCell className="text-sm text-gray-900 py-3">
-                      {shipping.address_from?.name || "-"}
-                    </TableCell>
-                    <TableCell className="text-sm text-gray-900 py-3">
-                      {formatDate(shipping.createdAt)}
-                    </TableCell>
-                    <TableCell className="text-sm text-gray-900 py-3">
-                      {getPaymentStatus(shipping.status)}
-                    </TableCell>
-                    <TableCell className="text-sm text-gray-900 py-3">
-                      <span
-                        className={`px-2 py-1 rounded-full text-xs font-medium ${getShippingLabelStatus(shipping) === "Label generated" ? "bg-green-100 text-green-800" : getShippingLabelStatus(shipping) === "Pending" ? "bg-yellow-100 text-yellow-800" : "bg-yellow-100 text-yellow-800"}`}
-                      >
-                        {getShippingLabelStatus(shipping)}
-                      </span>
-                    </TableCell>
-                    <TableCell className="text-sm text-gray-900 py-3">
-                      {shipping.carrier || "N/A"}
-                    </TableCell>
-                    {/* <TableCell className="text-sm text-gray-900 py-3 whitespace-pre-line">{getPriceBreakdown(shipping)}</TableCell> */}
-                    <TableCell className="text-sm text-gray-900 py-3">
-                      {shipping.shippingLabel && (
-                        <button
-                          className="text-[#0096FF] underline"
-                          onClick={() =>
-                            shipping.shippingLabel &&
-                            handleDownloadLabelFetch(
-                              shipping.shippingLabel,
-                              shipping._id,
-                            )
-                          }
-                          disabled={
-                            !shipping.shippingLabel ||
-                            downloadingId === shipping._id
-                          }
-                        >
-                          {downloadingId === shipping._id
-                            ? "Downloading..."
-                            : shipping.shippingLabel
-                              ? "Download label"
-                              : "No label"}
-                        </button>
-                      )}
-                    </TableCell>
-                    <TableCell className="text-sm text-gray-900 py-3">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() =>
-                          router.push(`/dashboard/orders/${shipping._id}`)
-                        }
-                        className="flex items-center gap-1.5 px-3 py-1.5"
-                      >
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                    Apply
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="flex-1"
+                    onClick={() => {
+                      setDateRange({ from: "", to: "" });
+                      setCurrentPage(1);
+                    }}
+                  >
+                    Clear
+                  </Button>
+                </div>
+              </div>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          {/* Business Filter */}
+          <DropdownMenu
+            open={showBusinessDropdown}
+            onOpenChange={setShowBusinessDropdown}
+          >
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="gap-2">
+                🏢 {getSelectedBusinessName()}{" "}
+                <ChevronDown className="w-4 h-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-64">
+              <div className="p-2">
+                <Input
+                  placeholder="Search business..."
+                  value={businessSearch}
+                  onChange={(e) => setBusinessSearch(e.target.value)}
+                  className="mb-2"
+                  onFocus={(e) => e.stopPropagation()}
+                />
+                <div className="max-h-60 overflow-y-auto">
+                  <DropdownMenuItem
+                    onClick={() => {
+                      setBusinessFilter("all");
+                      setBusinessSearch("");
+                      setCurrentPage(1);
+                      setShowBusinessDropdown(false);
+                    }}
+                    className={businessFilter === "all" ? "bg-blue-50" : ""}
+                  >
+                    All Businesses
+                  </DropdownMenuItem>
+                  {businessUsers.map((business: any) => (
+                    <DropdownMenuItem
+                      key={business._id}
+                      onClick={() => {
+                        setBusinessFilter(business._id);
+                        setBusinessSearch("");
+                        setCurrentPage(1);
+                        setShowBusinessDropdown(false);
+                      }}
+                      className={
+                        businessFilter === business._id ? "bg-blue-50" : ""
+                      }
+                    >
+                      {business.businessName}
+                    </DropdownMenuItem>
+                  ))}
+                </div>
+              </div>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <button
+            onClick={clearFilters}
+            className="text-sm text-blue-600 hover:text-blue-700 font-medium ml-auto"
+          >
+            Clear Filters
+          </button>
+        </div>
+      </div>
+
+      {/* Table */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100">
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader className="bg-gray-50">
+              <TableRow>
+                <TableHead>Order ID</TableHead>
+                <TableHead>Item</TableHead>
+                <TableHead>Business</TableHead>
+                <TableHead>Guest</TableHead>
+                <TableHead>Amount Paid (Breakdown)</TableHead>
+                <TableHead>Shipping Label Status</TableHead>
+                <TableHead>Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+
+            <TableBody>
+              {isLoading ? (
+                <TableRow>
+                  <TableCell colSpan={7} className="text-center py-8">
+                    Loading orders...
+                  </TableCell>
+                </TableRow>
+              ) : shipments.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={7} className="text-center py-8">
+                    No orders found
+                  </TableCell>
+                </TableRow>
+              ) : (
+                shipments.map((shipment: any) => {
+                  const item = shipment.parcel?.[0];
+                  const lostItem = shipment.lostItemId;
+                  const business = lostItem?.user;
+
+                  // Calculate amounts
+                  const shippingCost = shipment.shipping_cost || 0;
+                  const insuranceCost = shipment.insurance?.insuranceCost || 0;
+                  const totalCost =
+                    shipment.total_cost || shippingCost + insuranceCost;
+
+                  return (
+                    <TableRow key={shipment._id} className="hover:bg-gray-50">
+                      {/* Order ID */}
+                      <TableCell>
+                        <div className="font-medium text-gray-900 group/order-id relative">
+                          <span className="truncate max-w-[120px] inline-block">
+                            #{shipment._id.slice(-6)}
+                          </span>
+                          <div className="absolute bottom-full left-0 mb-1 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 invisible group-hover/order-id:opacity-100 group-hover/order-id:visible transition-all duration-200 whitespace-nowrap z-10 shadow-lg">
+                            #{shipment._id}
+                          </div>
+                        </div>
+                        <div className="text-xs text-blue-600">
+                          #{shipment._id.slice(-6)}
+                        </div>
+                      </TableCell>
+
+                      {/* Item */}
+                      <TableCell>
+                        <div className="flex items-center gap-3">
+                          <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center text-2xl">
+                            {getItemImage(
+                              item?.itemType || item?.name || "default",
+                            )}
+                          </div>
+                          <div>
+                            <div className="font-medium text-gray-900 group/item-name relative">
+                              <span className="truncate max-w-[120px] inline-block">
+                                {item?.name || lostItem?.itemName}
+                              </span>
+                              <div className="absolute bottom-full left-0 mb-1 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 invisible group-hover/item-name:opacity-100 group-hover/item-name:visible transition-all duration-200 whitespace-nowrap z-10 shadow-lg">
+                                {item?.name || lostItem?.itemName}
+                              </div>
+                            </div>
+                            <div className="text-xs text-gray-500">
+                              🆔 {shipment._id.slice(-8)}
+                            </div>
+                          </div>
+                        </div>
+                      </TableCell>
+
+                      {/* Business */}
+                      <TableCell>
+                        {/* <div className="font-medium text-gray-900 group/business-name relative">
+                                                    <span className="truncate max-w-[120px] inline-block">{business?.businessDetails?.businessName || business?.firstName + " " + business?.lastName || shipment.address_from?.email}</span>
+                                                    <div className="absolute bottom-full left-0 mb-1 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 invisible group-hover/business-name:opacity-100 group-hover/business-name:visible transition-all duration-200 whitespace-nowrap z-10 shadow-lg">
+                                                        {business?.businessDetails?.businessName || business?.firstName + " " + business?.lastName || shipment.address_from?.email}
+                                                    </div>
+                                                </div> */}
+                        <div className="font-medium text-gray-900 group/business-name relative">
+                          <span className="truncate max-w-[120px] inline-block">
+                            {shipment.address_from?.hotelName ||
+                              shipment.address_from?.name ||
+                              shipment.address_from?.email}
+                          </span>
+                          <div className="absolute bottom-full left-0 mb-1 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 invisible group-hover/business-name:opacity-100 group-hover/business-name:visible transition-all duration-200 whitespace-nowrap z-10 shadow-lg">
+                            {shipment.address_from?.hotelName ||
+                              shipment.address_from?.name ||
+                              shipment.address_from?.email}
+                          </div>
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          📍 {shipment.address_from?.city},{" "}
+                          {shipment.address_from?.countryName}
+                        </div>
+                      </TableCell>
+
+                      {/* Guest */}
+                      <TableCell>
+                        <div className="font-medium text-gray-900 group/guest-name relative">
+                          <span className="truncate max-w-[120px] inline-block">
+                            {lostItem?.guestName || shipment.address_to?.name}
+                          </span>
+                          <div className="absolute bottom-full left-0 mb-1 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 invisible group-hover/guest-name:opacity-100 group-hover/guest-name:visible transition-all duration-200 whitespace-nowrap z-10 shadow-lg">
+                            {lostItem?.guestName || shipment.address_to?.name}
+                          </div>
+                        </div>
+                        <div className="text-xs text-gray-500 group/guest-email relative mt-1">
+                          <span className="truncate max-w-[120px] inline-block">
+                            📧{" "}
+                            {lostItem?.guestEmail || shipment.address_to?.email}
+                          </span>
+                          <div className="absolute bottom-full left-0 mb-1 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 invisible group-hover/guest-email:opacity-100 group-hover/guest-email:visible transition-all duration-200 whitespace-nowrap z-10 shadow-lg">
+                            📧{" "}
+                            {lostItem?.guestEmail || shipment.address_to?.email}
+                          </div>
+                        </div>
+                      </TableCell>
+
+                      {/* Amount Paid */}
+                      <TableCell>
+                        <div className="text-sm space-y-0.5">
+                          <div className="text-gray-600">
+                            <span className="text-xs">Shipping:</span>{" "}
+                            <span className="font-medium">
+                              ${shippingCost.toFixed(2)}
+                            </span>
+                          </div>
+                          {insuranceCost > 0 && (
+                            <div className="text-gray-600">
+                              <span className="text-xs">Insurance:</span>{" "}
+                              <span className="font-medium">
+                                ${insuranceCost.toFixed(2)}
+                              </span>
+                            </div>
+                          )}
+                          <div className="text-gray-900 font-semibold">
+                            <span className="text-xs">Total:</span> $
+                            {totalCost.toFixed(2)}
+                          </div>
+                        </div>
+                      </TableCell>
+
+                      {/* Shipping Label Status */}
+                      <TableCell>
+                        {getLabelStatus(shipment) === "Uploaded" ? (
+                          <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-700">
+                            ✓ Uploaded
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-700">
+                            ⚠️ Waiting for label
+                          </span>
+                        )}
+                      </TableCell>
+
+                      {/* Actions */}
+                      <TableCell>
+                        <div className="flex gap-2">
+                          <Button
+                            size="sm"
+                            onClick={() => setSelectedItem(shipment)}
+                          >
+                            View
+                          </Button>
+
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="icon">
+                                <ChevronDown className="w-4 h-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-64">
+                              <DropdownMenuItem
+                                onClick={() => handleOpenLabelModal(shipment)}
+                                className="gap-2"
+                              >
+                                <Upload className="w-4 h-4" />
+                                Upload / Replace shipping label
+                              </DropdownMenuItem>
+
+                              {shipment.shippingLabel && (
+                                <DropdownMenuItem
+                                  onClick={async () => {
+                                    try {
+                                      const response = await fetch(
+                                        `${process.env.NEXT_PUBLIC_BASEURL}${shipment.shippingLabel}`,
+                                      );
+                                      const blob = await response.blob();
+                                      const url =
+                                        window.URL.createObjectURL(blob);
+                                      const a = document.createElement("a");
+                                      a.href = url;
+                                      a.download = "shipping-label.png";
+                                      a.click();
+                                      window.URL.revokeObjectURL(url);
+                                    } catch (error) {
+                                      console.error("Download failed:", error);
+                                    }
+                                  }}
+                                  className="gap-2"
+                                >
+                                  <Download className="w-4 h-4" />
+                                  Download label
+                                </DropdownMenuItem>
+                              )}
+
+                              {/* <DropdownMenuItem className="gap-2">
+                                                                <Mail className="w-4 h-4" />
+                                                                Resend order confirmation / tracking email
+                                                            </DropdownMenuItem> */}
+
+                              {/* <DropdownMenuItem className="gap-2">
+                                                                <ArrowRight className="w-4 h-4" />
+                                                                Move to Shipments
+                                                            </DropdownMenuItem> */}
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
+              )}
+            </TableBody>
+          </Table>
+        </div>
+
+        {/* Pagination */}
+        {meta.total > 0 && pathname !== "/dashboard" && (
+          <div className="px-6 py-4 border-t border-gray-100 flex flex-col md:flex-row justify-between gap-3">
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-gray-600">Rows per page</span>
+              <Select
+                value={String(rowsPerPage)}
+                onValueChange={(v) => {
+                  setRowsPerPage(Number(v));
+                  setCurrentPage(1);
+                }}
+              >
+                <SelectTrigger className="w-[70px] h-8">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="10">10</SelectItem>
+                  <SelectItem value="25">25</SelectItem>
+                  <SelectItem value="50">50</SelectItem>
+                </SelectContent>
+              </Select>
+              <span className="text-sm text-gray-600 ml-4">
+                Showing {(currentPage - 1) * rowsPerPage + 1} to{" "}
+                {Math.min(currentPage * rowsPerPage, meta.total)} of{" "}
+                {meta.total} items
+              </span>
+            </div>
+
+            <div className="flex items-center gap-4">
+              <Button
+                variant="ghost"
+                size="sm"
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+              >
+                &lt; Previous
+              </Button>
+              <span className="text-sm text-gray-600">
+                Page {currentPage} of {meta.totalPage || 1}
+              </span>
+              <Button
+                variant="ghost"
+                size="sm"
+                disabled={currentPage >= (meta.totalPage || 1)}
+                onClick={() => setCurrentPage((p) => p + 1)}
+              >
+                Next &gt;
+              </Button>
+            </div>
           </div>
+        )}
+      </div>
 
-          {/* Pagination */}
-          {totalItems > 0 ? (
-            <div className="flex items-center justify-between mt-6">
-              <div className="text-sm text-gray-600">
-                Showing {startIndex + 1} to {Math.min(endIndex, totalItems)} of{" "}
-                {totalItems} results
+      {showLabelModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold">Add Shipping Details</h3>
+              <button
+                onClick={() => setShowLabelModal(false)}
+                className="p-1 hover:bg-gray-100 rounded"
+                disabled={isUploadingLabel}
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              {/* Carrier */}
+              <div className="space-y-2">
+                <Label htmlFor="carrier">Courier / Carrier *</Label>
+                <Input
+                  id="carrier"
+                  placeholder="DHL, UPS, FedEx"
+                  value={carrier}
+                  onChange={(e) => setCarrier(e.target.value)}
+                  disabled={isUploadingLabel}
+                />
               </div>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={handlePrevious}
-                  disabled={currentPage === 1}
-                  className={`p-2 rounded-full ${currentPage === 1 ? "text-gray-400 cursor-not-allowed" : "text-[#3A3A3A] hover:bg-gray-100"}`}
-                >
-                  <ChevronLeft className="h-6 w-6" />
-                </button>
 
-                {/* Page Numbers with Ellipsis */}
-                {pageNumbers.map((page, index) =>
-                  page === "..." ? (
-                    <span
-                      key={`ellipsis-${index}`}
-                      className="px-2 text-[#3A3A3A]"
-                    >
-                      ...
-                    </span>
-                  ) : (
-                    <Button
-                      key={page}
-                      variant={currentPage === page ? "default" : "outline"}
-                      size="sm"
-                      className={`h-11 w-11 rounded-full ${currentPage === page ? "bg-[#0096FF] text-white" : "text-[#3A3A3A] border-0"}`}
-                      onClick={() => handlePageClick(page as number)}
-                    >
-                      {page}
-                    </Button>
-                  ),
+              {/* Tracking ID */}
+              <div className="space-y-2">
+                <Label htmlFor="trackingId">Tracking ID</Label>
+                <Input
+                  id="trackingId"
+                  placeholder="TRK123456789"
+                  value={trackingId}
+                  onChange={(e) => setTrackingId(e.target.value)}
+                  disabled={isUploadingLabel}
+                />
+              </div>
+
+              {/* Tracking URL */}
+              <div className="space-y-2">
+                <Label htmlFor="trackingUrl">Tracking URL</Label>
+                <Input
+                  id="trackingUrl"
+                  placeholder="https://tracking.dhl.com/TRK123456789"
+                  value={trackingUrl}
+                  onChange={(e) => setTrackingUrl(e.target.value)}
+                  disabled={isUploadingLabel}
+                />
+              </div>
+
+              {/* Shipping Label Upload */}
+              <div className="space-y-2">
+                <Label htmlFor="shippingLabel">Shipping Label *</Label>
+                <Input
+                  id="shippingLabel"
+                  type="file"
+                  onChange={handleFileChange}
+                  accept=".png,.jpg,.jpeg,.pdf"
+                  disabled={isUploadingLabel}
+                />
+                {shippingLabelFile && (
+                  <p className="text-sm text-green-600">
+                    ✓ Selected: {shippingLabelFile.name}
+                  </p>
                 )}
-
-                <button
-                  onClick={handleNext}
-                  disabled={currentPage === totalPages}
-                  className={`p-2 rounded-full ${currentPage === totalPages ? "text-gray-400 cursor-not-allowed" : "text-[#3A3A3A] hover:bg-gray-100"}`}
-                >
-                  <ChevronRight className="h-6 w-6" />
-                </button>
               </div>
             </div>
-          ) : (
-            <div className="text-center py-8 text-gray-500">
-              No orders found.
+
+            <div className="flex justify-end gap-3 mt-6">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setShowLabelModal(false);
+                  setShippingLabelFile(null);
+                }}
+                disabled={isUploadingLabel}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleUploadLabel}
+                disabled={isUploadingLabel || !shippingLabelFile}
+                className="gap-2"
+              >
+                {isUploadingLabel ? (
+                  <>
+                    <span className="animate-spin">⏳</span>
+                    Uploading...
+                  </>
+                ) : (
+                  <>
+                    <Upload className="w-4 h-4" />
+                    Upload & Update
+                  </>
+                )}
+              </Button>
             </div>
-          )}
-        </CardContent>
-      </Card>
+          </div>
+        </div>
+      )}
+
+      {/* Shipping Detail Modal */}
+      {selectedItem && (
+        <ShippingDetailsModal
+          open={!!selectedItem}
+          onClose={() => setSelectedItem(null)}
+          itemId={selectedItem?._id}
+        />
+      )}
     </div>
   );
-};
-
-export default BusinessOrdersPage;
+}

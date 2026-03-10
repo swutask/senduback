@@ -70,6 +70,9 @@ export const baseApi = createApi({
     "Zone",
     "ZoneShip",
     "FAQ",
+    "AdminStatistics",
+    "BusinessUser",
+    "Property",
   ],
   endpoints: () => ({}),
 });

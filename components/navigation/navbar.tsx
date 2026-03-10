@@ -18,9 +18,17 @@ import {
   Mail,
   HelpCircle,
   X,
+  LayoutDashboard,
+  LogOut,
 } from "lucide-react";
 import { Button } from "../ui/button";
 import { AccordionNavItem, Menu } from "./menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@radix-ui/react-dropdown-menu";
+import { DropdownMenuItem } from "../ui/dropdown-menu";
 
 export default function Header() {
   const [openMenu, setOpenMenu] = useState<MenuKey>(null);
@@ -30,6 +38,27 @@ export default function Header() {
   const supportRef = useRef<HTMLDivElement>(null);
 
   const pathname = usePathname();
+  const dispatch = useDispatch();
+
+  const isAuthenticated = useSelector((state: any) => state.auth?.accessToken);
+
+  const { data } = useGetCurrentUserQuery(undefined, {
+    skip: !isAuthenticated,
+  });
+
+  const user = isAuthenticated ? data?.data : null;
+
+  const getInitials = () => {
+    if (!user?.firstName && !user?.lastName) return "U";
+    return `${user?.firstName?.[0] ?? ""}${
+      user?.lastName?.[0] ?? ""
+    }`.toUpperCase();
+  };
+
+  const handleLogout = () => {
+    dispatch(logout());
+    setIsMobileMenuOpen(false);
+  };
 
   const NavItem = ({
     label,
@@ -228,23 +257,68 @@ export default function Header() {
             </div>
           ) : (
             <div className="hidden lg:flex items-center gap-5">
-              <Link
-                href="/login"
-                className="px-5 py-2.5 rounded-xl text-primary-new font-semibold transition"
-              >
-                Sign In
-              </Link>
+              {user ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <div className="flex items-center gap-3 cursor-pointer">
+                      {/* AVATAR */}
+                      {user?.image ? (
+                        <img
+                          src={`${process.env.NEXT_PUBLIC_BASEURL}${user.image}`}
+                          className="h-10 w-10 rounded-full object-cover border"
+                          alt="User Avatar"
+                        />
+                      ) : (
+                        <div className="h-10 w-10 rounded-full bg-primary-new flex items-center justify-center">
+                          <span className="text-white text-sm font-bold">
+                            {getInitials()}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </DropdownMenuTrigger>
 
-              <Link
-                href="/register"
-                className={cn(
-                  "font-semibold px-5 py-2.5 rounded-xl hover:opacity-90 transition",
-                  "bg-[linear-gradient(110.24deg,#0099FF_0%,#000080_100%)] text-white",
-                  "h-10 rounded-xl pt-2 pr-4 pb-2 pl-4 opacity-100",
-                )}
-              >
-                Register Business
-              </Link>
+                  <DropdownMenuContent className="w-48 bg-white p-3 rounded-xl">
+                    <DropdownMenuItem asChild>
+                      <Link
+                        href="/dashboard"
+                        className="flex items-center gap-2"
+                      >
+                        <LayoutDashboard className="w-4 h-4" />
+                        Dashboard
+                      </Link>
+                    </DropdownMenuItem>
+
+                    <DropdownMenuItem
+                      onClick={handleLogout}
+                      className="text-red-600 flex items-center gap-2"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      Logout
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <>
+                  <Link
+                    href="/signin"
+                    className="px-5 py-2.5 rounded-xl text-primary-new font-semibold transition"
+                  >
+                    Sign In
+                  </Link>
+
+                  <Link
+                    href="/signup"
+                    className={cn(
+                      "font-semibold px-5 py-2.5 rounded-xl hover:opacity-90 transition",
+                      "bg-[linear-gradient(110.24deg,#0099FF_0%,#000080_100%)] text-white",
+                      "h-10 rounded-xl pt-2 pr-4 pb-2 pl-4 opacity-100",
+                    )}
+                  >
+                    Register Business
+                  </Link>
+                </>
+              )}
             </div>
           )}
 
@@ -281,7 +355,6 @@ export function MobileMenu({
   isMobileMenuOpen: boolean;
   setIsMobileMenuOpen: React.Dispatch<SetStateAction<boolean>>;
 }) {
-  const pathname = usePathname();
   const dispatch = useDispatch();
 
   const isAuthenticated = useSelector((state: any) => state.auth?.accessToken);
@@ -387,7 +460,7 @@ export function MobileMenu({
           {!isAuthenticated ? (
             <div className="flex flex-col gap-3">
               <Link
-                href="/login"
+                href="/signin"
                 onClick={close}
                 className={cn(
                   "font-semibold px-5 py-2.5 rounded-xl hover:opacity-90 transition",
@@ -398,7 +471,7 @@ export function MobileMenu({
                 Sign In
               </Link>
               <Link
-                href="/register"
+                href="/signup"
                 className={cn(
                   "font-semibold px-5 py-2.5 rounded-xl hover:opacity-90 transition",
                   "bg-[linear-gradient(110.24deg,#0099FF_0%,#000080_100%)] text-white",

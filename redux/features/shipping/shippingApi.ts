@@ -1,5 +1,12 @@
 import { baseApi } from "@/redux/api/baseApi";
 
+export enum SHIPPING_STATUS {
+  PAYMENT_PENDING = "paymentPending",
+  PAYMENT_COMPLETED = "paymentCompleted",
+  IN_TRANSIT = "inTransit",
+  DELIVERED = "delivered",
+}
+
 export const shippingApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getShippings: builder.query({
@@ -7,18 +14,29 @@ export const shippingApi = baseApi.injectEndpoints({
         page = 1,
         limit = 10,
         status,
+        fromEmail,
+        from,
+        to,
+        searchTerm,
       }: {
         page?: number;
         limit?: number;
-        status?: string;
+        status?: string[];
+        fromEmail?: string;
+        from?: string;
+        to?: string;
+        searchTerm?: string;
       }) => {
-        const params = new URLSearchParams({
+        const query: Record<string, string> = {
           page: page.toString(),
           limit: limit.toString(),
-        });
-        if (status) {
-          params.append("status", status);
-        }
+          ...(status?.length && { status: status.join(",") }),
+          ...(fromEmail && { "address_from.email": fromEmail }),
+          ...(from && { from }),
+          ...(to && { to }),
+          ...(searchTerm && { searchTerm: searchTerm }),
+        };
+        const params = new URLSearchParams(query);
         return `/shipping?${params.toString()}`;
       },
       providesTags: ["Shipping"],
@@ -93,6 +111,22 @@ export const shippingApi = baseApi.injectEndpoints({
     getLostItem: builder.query({
       query: (id) => `/lost-item/${id}`,
     }),
+
+    markAsDelivered: builder.mutation({
+      query: (id: string) => ({
+        url: `/shipping/markAsDelivered/${id}`,
+        method: "PATCH",
+      }),
+      invalidatesTags: ["Shipping"],
+    }),
+
+    deleteShippingItem: builder.mutation({
+      query: (id: string) => ({
+        url: `/shipping/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Shipping"],
+    }),
   }),
 });
 
@@ -105,4 +139,6 @@ export const {
   useGetShippingRatesMutation,
   useAddInsuranceMutation,
   useAddSelectedRateMutation,
+  useMarkAsDeliveredMutation,
+  useDeleteShippingItemMutation,
 } = shippingApi;

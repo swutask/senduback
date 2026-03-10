@@ -80,7 +80,7 @@
 //   );
 // }
 
-import { Montserrat } from "next/font/google";
+import { Arimo, Montserrat } from "next/font/google";
 import "./globals.css";
 import { ReduxProvider } from "@/redux/ReduxProvider";
 import GlobalLoader from "@/components/shared/global-loader";
@@ -91,6 +91,12 @@ const montserrat = Montserrat({
   variable: "--font-Montserrat",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700", "800"],
+});
+
+const arimo = Arimo({
+  variable: "--font-Arimo",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -183,7 +189,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={`${montserrat.variable} antialiased`}>
+      <body className={`${montserrat.variable} ${arimo.variable} antialiased`}>
         <ReduxProvider>
           <GlobalLoader>{children}</GlobalLoader>
         </ReduxProvider>

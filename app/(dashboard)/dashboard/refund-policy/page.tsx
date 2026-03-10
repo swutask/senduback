@@ -1,14 +1,14 @@
 "use client";
-import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import {
+  useCreateOrUpdatePublicContentMutation,
+  useGetRefundPolicyQuery,
+} from "@/redux/features/public/publicApi";
 import { CheckCircle, Loader2 } from "lucide-react";
 import dynamic from "next/dynamic";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import {
-  useGetRefundPolicyQuery,
-  useCreateOrUpdatePublicContentMutation,
-} from "@/redux/features/public/publicApi";
 
 // Dynamically import Jodit Editor to avoid SSR issues
 const JoditEditor = dynamic(() => import("jodit-react"), {
@@ -171,7 +171,7 @@ const RefundPolicyPage = () => {
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="space-y-6 bg-white rounded-2xl p-5 shadow-lg">
       {/* Header */}
       <div className="space-y-2">
         <h1 className="text-3xl font-bold text-[#25324B]">
@@ -196,7 +196,7 @@ const RefundPolicyPage = () => {
       )}
 
       {/* Single Card with everything in one column */}
-      <Card className="shadow-[0_4px_4px_0_rgba(0,0,0,0.12)]">
+      <Card className="p-0">
         <CardContent className="p-6 space-y-6">
           <div className="space-y-2">
             <p className="text-sm text-gray-700">
@@ -211,7 +211,7 @@ const RefundPolicyPage = () => {
             </div>
           </div>
 
-          <div className="flex justify-between items-center">
+          <div className="space-y-4">
             <div className="space-y-1">
               <p className="text-sm text-gray-700">
                 Last Updated On : {lastUpdated}
@@ -221,7 +221,7 @@ const RefundPolicyPage = () => {
             <Button
               onClick={handleSave}
               disabled={isUpdating}
-              className="bg-[#0096FF] text-white hover:bg-blue-600 transition-colors py-2 px-6 rounded flex items-center gap-2"
+              className="py-4 lg:py-6 lg:px-4! gap-1 text-white bg-[linear-gradient(180deg,#0094FC_0%,#016ACF_100%)] rounded-xl hover:bg-[linear-gradient(180deg,#016ACF_0%,#0094FC_100%)] hover:text-white!"
             >
               {isUpdating ? (
                 <>

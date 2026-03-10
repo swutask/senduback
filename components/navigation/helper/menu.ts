@@ -58,7 +58,7 @@ export function getMenuData(key: MenuKey): MenuColumn[] {
               label: "Register Business",
               highlight: true,
               icon: ICONS["register"],
-              href: "/register",
+              href: "/signup",
             },
             { label: "Book Demo", icon: ICONS["bookDemo"] },
           ],

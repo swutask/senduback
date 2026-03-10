@@ -1,206 +1,10 @@
-// "use client";
-// import { useState } from "react";
-// import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-// import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-// import { Button } from "@/components/ui/button";
-// import { ChevronLeft, ChevronRight, Star, MoreVertical, Eye, Edit, Trash2 } from "lucide-react";
-
-// import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-// import { reviewsData } from "@/demo/reviewData";
-
-// const ReviewsPage = () => {
-//     const [currentPage, setCurrentPage] = useState(1);
-//     const itemsPerPage = 6;
-//     const totalItems = reviewsData.length;
-//     const totalPages = Math.ceil(totalItems / itemsPerPage);
-
-//     const startIndex = (currentPage - 1) * itemsPerPage;
-//     const endIndex = startIndex + itemsPerPage;
-//     const currentItems = reviewsData.slice(startIndex, endIndex);
-
-//     const getPageNumbers = () => {
-//         const pages = [];
-//         pages.push(1);
-
-//         if (currentPage > 3) {
-//             pages.push("...");
-//         }
-
-//         for (let i = Math.max(2, currentPage - 1); i <= Math.min(totalPages - 1, currentPage + 1); i++) {
-//             if (i !== 1 && i !== totalPages) {
-//                 pages.push(i);
-//             }
-//         }
-
-//         if (currentPage < totalPages - 2) {
-//             pages.push("...");
-//         }
-
-//         if (totalPages > 1) {
-//             pages.push(totalPages);
-//         }
-
-//         return pages;
-//     };
-
-//     const pageNumbers = getPageNumbers();
-
-//     const handlePrevious = () => {
-//         if (currentPage > 1) {
-//             setCurrentPage(currentPage - 1);
-//         }
-//     };
-
-//     const handleNext = () => {
-//         if (currentPage < totalPages) {
-//             setCurrentPage(currentPage + 1);
-//         }
-//     };
-
-//     const handlePageClick = (page: number) => {
-//         if (page !== currentPage) {
-//             setCurrentPage(page);
-//         }
-//     };
-
-//     const getStatusColor = (status: string) => {
-//         switch (status.toLowerCase()) {
-//             case "published":
-//                 return "bg-green-100 text-green-800";
-//             case "pending":
-//                 return "bg-yellow-100 text-yellow-800";
-//             case "rejected":
-//                 return "bg-red-100 text-red-800";
-//             default:
-//                 return "bg-gray-100 text-gray-800";
-//         }
-//     };
-
-//     const renderStars = (rating: number) => {
-//         return Array.from({ length: 5 }, (_, index) => <Star key={index} className={`h-4 w-4 ${index < rating ? "text-yellow-400 fill-yellow-400" : "text-gray-300"}`} />);
-//     };
-
-//     return (
-//         <div className="p-6 space-y-6">
-//             {/* Header Section */}
-//             <div className="space-y-2">
-//                 <h1 className="text-3xl font-bold text-[#25324B]">Reviews</h1>
-//                 <p className="text-[#7C8493] text-lg">Manage and monitor customer reviews and feedback.</p>
-//             </div>
-
-//             {/* Reviews Table Section */}
-//             <Card className="shadow-[0_4px_4px_0_rgba(0,0,0,0.12)]">
-//                 <CardHeader>
-//                     <CardTitle className="text-xl font-semibold text-gray-900">Customer Reviews</CardTitle>
-//                     <p className="text-sm text-gray-600 mt-1">All customer reviews and ratings from hotels.</p>
-//                 </CardHeader>
-//                 <CardContent>
-//                     <div className="overflow-x-auto border border-[#454B6066] rounded-lg">
-//                         <Table>
-//                             <TableHeader>
-//                                 <TableRow className="border-b border-[#454B6066] bg-[#EAEAEA] hover:bg-[#EAEAEA]">
-//                                     <TableHead className="text-sm font-bold text-gray-600 py-3">User</TableHead>
-//                                     <TableHead className="text-sm font-bold text-gray-600 py-3">Rating</TableHead>
-//                                     <TableHead className="text-sm font-bold text-gray-600 py-3">Comment</TableHead>
-//                                     <TableHead className="text-sm font-bold text-gray-600 py-3">Hotel</TableHead>
-//                                     <TableHead className="text-sm font-bold text-gray-600 py-3">Room</TableHead>
-//                                     <TableHead className="text-sm font-bold text-gray-600 py-3">Date</TableHead>
-//                                     <TableHead className="text-sm font-bold text-gray-600 py-3">Status</TableHead>
-//                                     <TableHead className="text-sm font-bold text-gray-600 py-3">Actions</TableHead>
-//                                 </TableRow>
-//                             </TableHeader>
-//                             <TableBody>
-//                                 {currentItems.map((review) => (
-//                                     <TableRow key={review.id} className="border-b border-[#454B6066] hover:bg-gray-50 transition-colors last:border-b-0">
-//                                         <TableCell className="py-3">
-//                                             <div className="space-y-1">
-//                                                 <div className="font-medium text-gray-900">{review.userName}</div>
-//                                                 <div className="text-sm text-gray-500">{review.userEmail}</div>
-//                                             </div>
-//                                         </TableCell>
-//                                         <TableCell className="py-3">
-//                                             <div className="flex items-center gap-1">
-//                                                 {renderStars(review.rating)}
-//                                                 <span className="text-sm text-gray-600 ml-1">({review.rating})</span>
-//                                             </div>
-//                                         </TableCell>
-//                                         <TableCell className="py-3 max-w-xs">
-//                                             <div className="text-sm text-gray-900 line-clamp-2">{review.comment}</div>
-//                                         </TableCell>
-//                                         <TableCell className="py-3 text-sm text-gray-900">{review.hotel}</TableCell>
-//                                         <TableCell className="py-3 text-sm text-gray-900">{review.roomNumber}</TableCell>
-//                                         <TableCell className="py-3 text-sm text-gray-900">{review.date}</TableCell>
-//                                         <TableCell className="py-3">
-//                                             <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(review.status)}`}>{review.status}</span>
-//                                         </TableCell>
-//                                         <TableCell className="py-3">
-//                                             <DropdownMenu>
-//                                                 <DropdownMenuTrigger asChild>
-//                                                     <Button variant="ghost" className="h-8 w-8 p-0">
-//                                                         <MoreVertical className="h-4 w-4" />
-//                                                     </Button>
-//                                                 </DropdownMenuTrigger>
-//                                                 <DropdownMenuContent align="end">
-//                                                     <DropdownMenuItem className="flex items-center gap-2">
-//                                                         <Eye className="h-4 w-4" />
-//                                                         View Details
-//                                                     </DropdownMenuItem>
-//                                                     <DropdownMenuItem className="flex items-center gap-2">
-//                                                         <Edit className="h-4 w-4" />
-//                                                         Edit Status
-//                                                     </DropdownMenuItem>
-//                                                     <DropdownMenuItem className="flex items-center gap-2 text-red-600">
-//                                                         <Trash2 className="h-4 w-4" />
-//                                                         Delete
-//                                                     </DropdownMenuItem>
-//                                                 </DropdownMenuContent>
-//                                             </DropdownMenu>
-//                                         </TableCell>
-//                                     </TableRow>
-//                                 ))}
-//                             </TableBody>
-//                         </Table>
-//                     </div>
-
-//                     {/* Pagination */}
-//                     <div className="flex items-center justify-between mt-6">
-//                         <div className="text-sm text-gray-600">
-//                             Showing {startIndex + 1} to {Math.min(endIndex, totalItems)} of {totalItems} results
-//                         </div>
-//                         <div className="flex items-center gap-2">
-//                             <button onClick={handlePrevious} disabled={currentPage === 1} className={`p-2 rounded-full ${currentPage === 1 ? "text-gray-400 cursor-not-allowed" : "text-[#3A3A3A] hover:bg-gray-100"}`}>
-//                                 <ChevronLeft className="h-6 w-6" />
-//                             </button>
-
-//                             {/* Page Numbers with Ellipsis */}
-//                             {pageNumbers.map((page, index) =>
-//                                 page === "..." ? (
-//                                     <span key={`ellipsis-${index}`} className="px-2 text-[#3A3A3A]">
-//                                         ...
-//                                     </span>
-//                                 ) : (
-//                                     <Button key={page} variant={currentPage === page ? "default" : "outline"} size="sm" className={`h-11 w-11 rounded-full ${currentPage === page ? "bg-[#0096FF] text-white" : "text-[#3A3A3A] border-0"}`} onClick={() => handlePageClick(page as number)}>
-//                                         {page}
-//                                     </Button>
-//                                 )
-//                             )}
-
-//                             <button onClick={handleNext} disabled={currentPage === totalPages} className={`p-2 rounded-full ${currentPage === totalPages ? "text-gray-400 cursor-not-allowed" : "text-[#3A3A3A] hover:bg-gray-100"}`}>
-//                                 <ChevronRight className="h-6 w-6" />
-//                             </button>
-//                         </div>
-//                     </div>
-//                 </CardContent>
-//             </Card>
-//         </div>
-//     );
-// };
-
-// export default ReviewsPage;
-
 "use client";
-import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
+import { useState } from "react";
+import { Search, ChevronDown, Plus, Star, Trash2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Table,
   TableBody,
@@ -209,20 +13,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import {
-  ChevronLeft,
-  ChevronRight,
-  Star,
-  MoreVertical,
-  Eye,
-  Trash2,
-  X,
-  Calendar,
-  User,
-  Mail,
-  StarIcon,
-} from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -230,442 +20,606 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-  useGetAllReviewsQuery,
-  useDeleteReviewMutation,
-} from "@/redux/features/review/reviewApi";
-import { toast } from "sonner";
-import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogDescription,
+  DialogFooter,
 } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import {
+  useGetReviewsQuery,
+  useDeleteReviewMutation,
+  useCreateReviewMutation,
+} from "@/redux/features/review/reviewApi";
+import { toast } from "sonner";
+import Swal from "sweetalert2";
 
-const ReviewsPage = () => {
-  const [currentPage, setCurrentPage] = useState(1);
-  const [selectedReview, setSelectedReview] = useState<any>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+interface Review {
+  _id: string;
+  name: string;
+  email: string;
+  rating: number;
+  comment: string;
+  createdAt: string;
+}
 
-  const {
-    data: apiData,
-    isLoading,
-    isError,
-    refetch,
-  } = useGetAllReviewsQuery(undefined);
+export default function ReviewsPage() {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const [selectedReview, setSelectedReview] = useState<Review | null>(null);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+
+  // New review form state
+  const [newReview, setNewReview] = useState({
+    name: "",
+    email: "",
+    rating: 5,
+    comment: "",
+  });
+
+  // Fetch reviews from API
+  const { data, isLoading, isError, refetch } = useGetReviewsQuery({
+    page,
+    limit,
+    searchTerm: searchTerm || undefined,
+  });
+
   const [deleteReview] = useDeleteReviewMutation();
+  const [createReview, { isLoading: isCreating }] = useCreateReviewMutation();
 
-  const reviewsData = apiData?.data?.reviews || [];
-  const metaData = apiData?.data?.meta || {
-    total: 0,
-    limit: 6,
-    page: 1,
-    totalPage: 1,
-  };
+  // Handle delete review
+  const handleDeleteReview = async (id: string) => {
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, delete it!",
+      cancelButtonText: "Cancel",
+      background: "#fff",
+      customClass: {
+        popup: "rounded-lg shadow-xl",
+        title: "text-lg font-semibold",
+        confirmButton: "px-4 py-2 rounded-md",
+        cancelButton: "px-4 py-2 rounded-md",
+      },
+    });
 
-  const itemsPerPage = metaData.limit || 6;
-  const totalItems = metaData.total || 0;
-  const totalPages = metaData.totalPage || 1;
+    if (result.isConfirmed) {
+      try {
+        await deleteReview(id).unwrap();
 
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const currentItems = reviewsData.slice(startIndex, endIndex);
-
-  const getPageNumbers = () => {
-    const pages = [];
-    pages.push(1);
-
-    if (currentPage > 3) {
-      pages.push("...");
-    }
-
-    for (
-      let i = Math.max(2, currentPage - 1);
-      i <= Math.min(totalPages - 1, currentPage + 1);
-      i++
-    ) {
-      if (i !== 1 && i !== totalPages) {
-        pages.push(i);
+        await Swal.fire({
+          title: "Deleted!",
+          text: "Review has been deleted.",
+          icon: "success",
+          timer: 2000,
+          timerProgressBar: true,
+          showConfirmButton: false,
+          background: "#fff",
+          customClass: {
+            popup: "rounded-lg shadow-xl",
+          },
+        });
+      } catch (error) {
+        await Swal.fire({
+          title: "Error!",
+          text: "Failed to delete review.",
+          icon: "error",
+          confirmButtonColor: "#d33",
+          background: "#fff",
+          customClass: {
+            popup: "rounded-lg shadow-xl",
+          },
+        });
       }
     }
-
-    if (currentPage < totalPages - 2) {
-      pages.push("...");
-    }
-
-    if (totalPages > 1) {
-      pages.push(totalPages);
-    }
-
-    return pages;
   };
 
-  const pageNumbers = getPageNumbers();
-
-  const handlePrevious = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
+  // Handle create new review
+  const handleCreateReview = async () => {
+    // Validate form
+    if (
+      !newReview.name.trim() ||
+      !newReview.email.trim() ||
+      !newReview.comment.trim()
+    ) {
+      toast.error("Please fill in all required fields");
+      return;
     }
-  };
 
-  const handleNext = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
+    if (newReview.rating < 1 || newReview.rating > 5) {
+      toast.error("Rating must be between 1 and 5");
+      return;
     }
-  };
 
-  const handlePageClick = (page: any) => {
-    if (page !== currentPage) {
-      setCurrentPage(page);
-    }
-  };
-
-  const getStatusColor = (status: any) => {
-    switch (status.toLowerCase()) {
-      case "published":
-        return "bg-green-100 text-green-800";
-      case "pending":
-        return "bg-yellow-100 text-yellow-800";
-      case "rejected":
-        return "bg-red-100 text-red-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
-  };
-
-  const renderStars = (rating: any) => {
-    return Array.from({ length: 5 }, (_, index) => (
-      <Star
-        key={index}
-        className={`h-4 w-4 ${index < rating ? "text-yellow-400 fill-yellow-400" : "text-gray-300"}`}
-      />
-    ));
-  };
-
-  const handleDeleteReview = async (id: string) => {
     try {
-      await deleteReview(id).unwrap();
-      toast.success("Review deleted successfully");
-      refetch();
-    } catch (error) {
-      toast.error("Failed to delete review");
+      await createReview(newReview).unwrap();
+      toast.success("Review created successfully!");
+      setNewReview({
+        name: "",
+        email: "",
+        rating: 5,
+        comment: "",
+      });
+      setIsAddModalOpen(false);
+      refetch(); // Refresh the reviews list
+    } catch (error: any) {
+      toast.error(error?.data?.message || "Failed to create review");
     }
   };
 
-  const handleViewDetails = (review: any) => {
+  // Determine status based on rating
+  const getReviewStatus = (rating: number) => {
+    if (rating >= 4) return "Published";
+    if (rating >= 3) return "Pending";
+    return "Flagged";
+  };
+
+  // Format date
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  };
+
+  // Open modal with review details
+  const openReviewModal = (review: Review) => {
     setSelectedReview(review);
-    setIsModalOpen(true);
+    setIsViewModalOpen(true);
   };
 
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setSelectedReview(null);
+  // Reset new review form
+  const resetNewReviewForm = () => {
+    setNewReview({
+      name: "",
+      email: "",
+      rating: 5,
+      comment: "",
+    });
   };
 
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [apiData]);
-
+  // Loading state
   if (isLoading) {
     return (
       <div className="p-6">
-        <h1 className="text-3xl font-bold text-[#25324B]">Reviews</h1>
-        <p className="text-[#7C8493] text-lg mt-2">Loading reviews...</p>
+        <div className="mb-6">
+          <div className="flex items-center gap-3 mb-1">
+            <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+              <span className="text-blue-600">⭐</span>
+            </div>
+            <h1 className="text-2xl font-semibold text-gray-900">Reviews</h1>
+          </div>
+          <p className="text-sm text-gray-600">Guest feedback and ratings</p>
+        </div>
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+          <div className="animate-pulse space-y-4">
+            <div className="h-10 bg-gray-200 rounded"></div>
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="h-16 bg-gray-100 rounded"></div>
+            ))}
+          </div>
+        </div>
       </div>
     );
   }
 
-  if (isError) {
+  // Error state
+  if (isError || !data?.data?.reviews) {
     return (
       <div className="p-6">
-        <h1 className="text-3xl font-bold text-[#25324B]">Reviews</h1>
-        <p className="text-red-500 text-lg mt-2">
-          Error loading reviews. Please try again.
-        </p>
+        <div className="mb-6">
+          <div className="flex items-center gap-3 mb-1">
+            <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+              <span className="text-blue-600">⭐</span>
+            </div>
+            <h1 className="text-2xl font-semibold text-gray-900">Reviews</h1>
+          </div>
+          <p className="text-sm text-gray-600">Guest feedback and ratings</p>
+        </div>
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 text-center">
+          <p className="text-red-600">Failed to load reviews</p>
+          <Button className="mt-4" onClick={() => window.location.reload()}>
+            Retry
+          </Button>
+        </div>
       </div>
     );
   }
 
+  const reviews = data.data.reviews;
+  const totalReviews = data.data.meta?.total || 0;
+
   return (
-    <div className="p-6 space-y-6">
-      {/* View Details Modal */}
-      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle className="text-2xl font-bold text-[#25324B]">
-              Review Details
-            </DialogTitle>
-            <DialogDescription>
-              Detailed information about this customer review
-            </DialogDescription>
-          </DialogHeader>
-
-          {selectedReview && (
-            <div className="space-y-6">
-              {/* User Info */}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2">
-                    <User className="h-5 w-5 text-gray-500" />
-                    <div>
-                      <p className="text-sm text-gray-500">Customer Name</p>
-                      <p className="font-medium">{selectedReview.name}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Mail className="h-5 w-5 text-gray-500" />
-                    <div>
-                      <p className="text-sm text-gray-500">Email</p>
-                      <p className="font-medium">{selectedReview.email}</p>
-                    </div>
-                  </div>
+    <>
+      <div className="w-[92vw] md:w-[770px] lg:w-full mx-auto lg:mx-0">
+        {/* Header */}
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <div className="flex items-center gap-3 mb-1">
+                <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                  <span className="text-blue-600">⭐</span>
                 </div>
-
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2">
-                    <Calendar className="h-5 w-5 text-gray-500" />
-                    <div>
-                      <p className="text-sm text-gray-500">Submitted Date</p>
-                      <p className="font-medium">
-                        {selectedReview.createdAt
-                          ? new Date(
-                              selectedReview.createdAt,
-                            ).toLocaleDateString()
-                          : "N/A"}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <StarIcon className="h-5 w-5 text-gray-500" />
-                    <div>
-                      <p className="text-sm text-gray-500">Rating</p>
-                      <div className="flex items-center gap-1">
-                        {renderStars(selectedReview.rating)}
-                        <span className="ml-2 font-medium">
-                          ({selectedReview.rating}/5)
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <h1 className="text-2xl font-semibold text-gray-900">
+                  Reviews
+                </h1>
               </div>
-
-              {/* Review Comment */}
-              <div className="space-y-3">
-                <p className="text-sm font-medium text-gray-700">
-                  Review Comment
-                </p>
-                <div className="bg-gray-50 p-4 rounded-lg border">
-                  <p className="text-gray-700">
-                    {selectedReview.comment || "No comment provided"}
-                  </p>
-                </div>
-              </div>
-
-              {/* Status */}
-              <div className="flex items-center justify-between">
-                <div className="space-y-2">
-                  <p className="text-sm font-medium text-gray-700">Status</p>
-                  <span
-                    className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getStatusColor("published")}`}
-                  >
-                    Published
-                  </span>
-                </div>
-
-                <div className="space-y-2">
-                  <p className="text-sm font-medium text-gray-700">Review ID</p>
-                  <p className="text-sm text-gray-500 font-mono">
-                    {selectedReview._id}
-                  </p>
-                </div>
-              </div>
+              <p className="text-sm text-gray-600">
+                {totalReviews} guest feedback and ratings
+              </p>
             </div>
-          )}
 
-          <div className="flex justify-end gap-3 pt-4 border-t">
-            <Button variant="outline" onClick={handleCloseModal}>
-              Close
+            {/* Add Review Button */}
+            <Button
+              onClick={() => setIsAddModalOpen(true)}
+              className="bg-[linear-gradient(180deg,rgba(0,148,252,0.80)_19.32%,rgba(1,106,207,0.80)_100%)] hover:bg-[linear-gradient(180deg,rgba(0,148,252,1)_19.32%,rgba(1,106,207,1)_100%)] text-white px-4 py-2 rounded-md transition-colors"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Add Review
             </Button>
-            {selectedReview && (
-              <Button
-                variant="destructive"
-                onClick={() => {
-                  handleDeleteReview(selectedReview._id);
-                  handleCloseModal();
-                }}
-              >
-                <Trash2 className="h-4 w-4 mr-2" />
-                Delete Review
-              </Button>
-            )}
           </div>
-        </DialogContent>
-      </Dialog>
+        </div>
 
-      {/* Header Section */}
-      <div className="space-y-2">
-        <h1 className="text-3xl font-bold text-[#25324B]">Reviews</h1>
-        <p className="text-[#7C8493] text-lg">
-          Manage and monitor customer reviews and feedback.
-        </p>
-      </div>
+        {/* Search */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 mb-6 p-4">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <Input
+              placeholder="Search by guest, email, or comment..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 py-2.5"
+            />
+          </div>
+        </div>
 
-      {/* Reviews Table Section */}
-      <Card className="shadow-[0_4px_4px_0_rgba(0,0,0,0.12)]">
-        <CardHeader>
-          <CardTitle className="text-xl font-semibold text-gray-900">
-            Customer Reviews
-          </CardTitle>
-          <p className="text-sm text-gray-600 mt-1">
-            All customer reviews and ratings.
-          </p>
-        </CardHeader>
-        <CardContent>
-          <div className="overflow-x-auto border border-[#454B6066] rounded-lg">
-            <Table>
-              <TableHeader>
-                <TableRow className="border-b border-[#454B6066] bg-[#EAEAEA] hover:bg-[#EAEAEA]">
-                  <TableHead className="text-sm font-bold text-gray-600 py-3">
-                    User
-                  </TableHead>
-                  <TableHead className="text-sm font-bold text-gray-600 py-3">
-                    Rating
-                  </TableHead>
-                  <TableHead className="text-sm font-bold text-gray-600 py-3">
-                    Comment
-                  </TableHead>
-                  <TableHead className="text-sm font-bold text-gray-600 py-3">
-                    Date
-                  </TableHead>
-                  <TableHead className="text-sm font-bold text-gray-600 py-3">
-                    Status
-                  </TableHead>
-                  <TableHead className="text-sm font-bold text-gray-600 py-3">
-                    Actions
-                  </TableHead>
+        {/* Table */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100">
+          <div className="overflow-x-auto">
+            <Table className="">
+              <TableHeader className="h-12 bg-gray-50 border-b border-gray-100">
+                <TableRow>
+                  <TableHead>Guest Name</TableHead>
+                  <TableHead>Email</TableHead>
+                  <TableHead>Rating</TableHead>
+                  <TableHead>Comment</TableHead>
+                  <TableHead>Created On</TableHead>
+                  {/* <TableHead>Status</TableHead> */}
+                  <TableHead>Actions</TableHead>
                 </TableRow>
               </TableHeader>
+
               <TableBody>
-                {currentItems.map((review: any) => (
-                  <TableRow
-                    key={review._id}
-                    className="border-b border-[#454B6066] hover:bg-gray-50 transition-colors last:border-b-0"
-                  >
-                    <TableCell className="py-3">
-                      <div className="space-y-1">
-                        <div className="font-medium text-gray-900">
-                          {review.name}
-                        </div>
-                        <div className="text-sm text-gray-500">
-                          {review.email}
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell className="py-3">
-                      <div className="flex items-center gap-1">
-                        {renderStars(review.rating)}
-                        <span className="text-sm text-gray-600 ml-1">
-                          ({review.rating})
-                        </span>
-                      </div>
-                    </TableCell>
-                    <TableCell className="py-3 max-w-xs">
-                      <div className="text-sm text-gray-900 line-clamp-2">
-                        {review.comment || "No comment"}
-                      </div>
-                    </TableCell>
-                    <TableCell className="py-3 text-sm text-gray-900">
-                      {review.createdAt
-                        ? new Date(review.createdAt).toLocaleDateString()
-                        : "N/A"}
-                    </TableCell>
-                    <TableCell className="py-3">
-                      <span
-                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor("published")}`}
-                      >
-                        Published
-                      </span>
-                    </TableCell>
-                    <TableCell className="py-3">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="h-8 w-8 p-0">
-                            <MoreVertical className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem
-                            className="flex items-center gap-2"
-                            onClick={() => handleViewDetails(review)}
-                          >
-                            <Eye className="h-4 w-4" />
-                            View Details
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            className="flex items-center gap-2 text-red-600"
-                            onClick={() => handleDeleteReview(review._id)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                            Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                {reviews.length === 0 ? (
+                  <TableRow>
+                    <TableCell
+                      colSpan={7}
+                      className="text-center py-8 text-gray-500"
+                    >
+                      No reviews found
                     </TableCell>
                   </TableRow>
-                ))}
+                ) : (
+                  reviews.map((review: any) => {
+                    const status = getReviewStatus(review.rating);
+
+                    return (
+                      <TableRow key={review._id} className="hover:bg-gray-50">
+                        <TableCell className="font-medium">
+                          {review.name}
+                        </TableCell>
+
+                        <TableCell className="text-sm text-gray-600">
+                          {review.email}
+                        </TableCell>
+
+                        <TableCell>
+                          <div className="flex items-center gap-1">
+                            {Array.from({ length: 5 }).map((_, i) => (
+                              <span key={i} className="text-yellow-500">
+                                {i < review.rating ? "★" : "☆"}
+                              </span>
+                            ))}
+                            <span className="ml-2 text-sm text-gray-600">
+                              ({review.rating}/5)
+                            </span>
+                          </div>
+                        </TableCell>
+
+                        <TableCell className="max-w-[300px]">
+                          <div
+                            className="text-sm text-gray-700 truncate"
+                            title={review.comment}
+                          >
+                            {review.comment}
+                          </div>
+                        </TableCell>
+
+                        <TableCell className="text-sm text-gray-600">
+                          {formatDate(review.createdAt)}
+                        </TableCell>
+
+                        <TableCell>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="icon">
+                                <ChevronDown className="w-4 h-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+
+                            <DropdownMenuContent align="end" className="w-48">
+                              <DropdownMenuItem
+                                onClick={() => openReviewModal(review)}
+                              >
+                                👁 View full review
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                className="text-red-600"
+                                onClick={() => handleDeleteReview(review._id)}
+                              >
+                                <Trash2 className="w-4 h-4 mr-2" />
+                                Delete
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })
+                )}
               </TableBody>
             </Table>
           </div>
 
-          <div className="flex items-center justify-between mt-6">
-            <div className="text-sm text-gray-600">
-              Showing {startIndex + 1} to {Math.min(endIndex, totalItems)} of{" "}
-              {totalItems} results
+          {/* Pagination */}
+          {data.data.meta && data.data.meta.totalPage > 1 && (
+            <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-between">
+              <div className="text-sm text-gray-600">
+                Showing {(page - 1) * limit + 1} -{" "}
+                {Math.min(page * limit, totalReviews)} of {totalReviews}
+              </div>
+
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setPage((prev) => Math.max(1, prev - 1))}
+                  disabled={page === 1}
+                >
+                  Previous
+                </Button>
+
+                <span className="text-sm text-gray-600">
+                  Page {page} of {data.data.meta.totalPage}
+                </span>
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() =>
+                    setPage((prev) =>
+                      Math.min(data.data.meta.totalPage, prev + 1),
+                    )
+                  }
+                  disabled={page === data.data.meta.totalPage}
+                >
+                  Next
+                </Button>
+              </div>
             </div>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={handlePrevious}
-                disabled={currentPage === 1}
-                className={`p-2 rounded-full ${currentPage === 1 ? "text-gray-400 cursor-not-allowed" : "text-[#3A3A3A] hover:bg-gray-100"}`}
-              >
-                <ChevronLeft className="h-6 w-6" />
-              </button>
+          )}
+        </div>
+      </div>
 
-              {pageNumbers.map((page, index) =>
-                page === "..." ? (
-                  <span
-                    key={`ellipsis-${index}`}
-                    className="px-2 text-[#3A3A3A]"
-                  >
-                    ...
+      {/* View Review Details Modal */}
+      <Dialog open={isViewModalOpen} onOpenChange={setIsViewModalOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-semibold">
+              Review Details
+            </DialogTitle>
+          </DialogHeader>
+
+          {selectedReview && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-gray-500">Guest</p>
+                  <p className="font-medium">{selectedReview.name}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Email</p>
+                  <p className="font-medium text-blue-600">
+                    {selectedReview.email}
+                  </p>
+                </div>
+              </div>
+
+              <div>
+                <p className="text-sm text-gray-500 mb-2">Rating</p>
+                <div className="flex items-center gap-2">
+                  <div className="flex">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <Star
+                        key={i}
+                        className={`w-5 h-5 ${i < selectedReview.rating ? "text-yellow-500 fill-yellow-500" : "text-gray-300"}`}
+                      />
+                    ))}
+                  </div>
+                  <span className="text-sm font-medium">
+                    {selectedReview.rating}/5
                   </span>
-                ) : (
-                  <Button
-                    key={page}
-                    variant={currentPage === page ? "default" : "outline"}
-                    size="sm"
-                    className={`h-11 w-11 rounded-full ${currentPage === page ? "bg-[#0096FF] text-white" : "text-[#3A3A3A] border-0"}`}
-                    onClick={() => handlePageClick(page)}
-                  >
-                    {page}
-                  </Button>
-                ),
-              )}
+                </div>
+              </div>
 
-              <button
-                onClick={handleNext}
-                disabled={currentPage === totalPages}
-                className={`p-2 rounded-full ${currentPage === totalPages ? "text-gray-400 cursor-not-allowed" : "text-[#3A3A3A] hover:bg-gray-100"}`}
-              >
-                <ChevronRight className="h-6 w-6" />
-              </button>
+              <div>
+                <p className="text-sm text-gray-500 mb-2">Comment</p>
+                <div className="bg-gray-50 p-3 rounded-md">
+                  <p className="text-gray-700 text-sm">
+                    {selectedReview.comment}
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-gray-500">Date</p>
+                  <p className="text-sm font-medium">
+                    {formatDate(selectedReview.createdAt)}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Status</p>
+                  <span
+                    className={`inline-block px-2 py-1 rounded text-xs font-medium ${getReviewStatus(selectedReview.rating) === "Published" ? "bg-green-100 text-green-700" : getReviewStatus(selectedReview.rating) === "Pending" ? "bg-yellow-100 text-yellow-700" : "bg-red-100 text-red-700"}`}
+                  >
+                    {getReviewStatus(selectedReview.rating)}
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-2 pt-4 border-t">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsViewModalOpen(false)}
+                >
+                  Close
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="text-red-600"
+                  onClick={() => {
+                    handleDeleteReview(selectedReview._id);
+                    setIsViewModalOpen(false);
+                  }}
+                >
+                  Delete
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Add Review Modal */}
+      <Dialog
+        open={isAddModalOpen}
+        onOpenChange={(open) => {
+          setIsAddModalOpen(open);
+          if (!open) resetNewReviewForm();
+        }}
+      >
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-semibold">
+              Add New Review
+            </DialogTitle>
+            <DialogDescription>
+              Add a review from a guest. All fields are required.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="name">Guest Name *</Label>
+              <Input
+                id="name"
+                placeholder="John Doe"
+                value={newReview.name}
+                onChange={(e) =>
+                  setNewReview({ ...newReview, name: e.target.value })
+                }
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="email">Email Address *</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="john@example.com"
+                value={newReview.email}
+                onChange={(e) =>
+                  setNewReview({ ...newReview, email: e.target.value })
+                }
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Rating *</Label>
+              <div className="flex items-center gap-2">
+                {[1, 2, 3, 4, 5].map((rating) => (
+                  <button
+                    key={rating}
+                    type="button"
+                    onClick={() => setNewReview({ ...newReview, rating })}
+                    className="p-1 hover:scale-110 transition-transform"
+                  >
+                    <Star
+                      className={`w-8 h-8 ${rating <= newReview.rating ? "text-yellow-500 fill-yellow-500" : "text-gray-300"}`}
+                    />
+                  </button>
+                ))}
+                <span className="ml-2 text-sm text-gray-600">
+                  ({newReview.rating}/5)
+                </span>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="comment">Comment *</Label>
+              <Textarea
+                id="comment"
+                placeholder="Share your experience..."
+                rows={4}
+                value={newReview.comment}
+                onChange={(e) =>
+                  setNewReview({ ...newReview, comment: e.target.value })
+                }
+              />
+            </div>
+
+            <div className="bg-gray-50 p-3 rounded-md text-sm text-gray-600">
+              <p className="font-medium mb-1">Example Review:</p>
+              <p>
+                "Lost my iPhone 13 while traveling by rickshaw. The phone has a
+                cracked screen protector."
+              </p>
             </div>
           </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
-};
 
-export default ReviewsPage;
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setIsAddModalOpen(false);
+                resetNewReviewForm();
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleCreateReview}
+              disabled={isCreating}
+              className="bg-[linear-gradient(180deg,rgba(0,148,252,0.90)_19.32%,rgba(1,106,207,0.90)_100%)] hover:bg-[linear-gradient(180deg,rgba(0,148,252,1)_19.32%,rgba(1,106,207,1)_100%)] text-white disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isCreating ? "Adding..." : "Add Review"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+}

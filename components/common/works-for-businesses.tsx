@@ -133,7 +133,7 @@ function CTAButtons({
         "flex-col md:flex-row w-full md:w-auto text-nowrap",
       )}
     >
-      <Link href={"/register"} className="w-full">
+      <Link href={"/signup"} className="w-full">
         <motion.button
           whileHover={{ scale: 1.03, transition: { duration: 0.18 } }}
           whileTap={{ scale: 0.97 }}

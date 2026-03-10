@@ -95,7 +95,7 @@
 "use client";
 
 import { motion, type Variants } from "framer-motion";
-import { useGetAllReviewsQuery } from "@/redux/features/review/reviewApi";
+import { useGetReviewsQuery } from "@/redux/features/review/reviewApi";
 import LoadingSpinner from "@/lib/loading-spinner";
 import { TestimonialT } from "@/lib/Types";
 
@@ -221,7 +221,7 @@ const TestimonialCard = ({
 };
 
 export default function Testimonials() {
-  const { data, isLoading } = useGetAllReviewsQuery(undefined);
+  const { data, isLoading } = useGetReviewsQuery({});
   const reviews: TestimonialT[] = data?.data?.reviews ?? [];
 
   return (

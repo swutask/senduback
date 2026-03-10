@@ -1,15 +1,3 @@
-// "use client";
-// import { selectCurrentUser } from "@/redux/features/auth/authSlice";
-// import { useAppSelector } from "@/redux/hook";
-// import React from "react";
-
-// export default function layout({ children }: { children: React.ReactNode }) {
-//     const user = useAppSelector(selectCurrentUser);
-//     console.log(user);
-
-//     return <>{children}</>;
-// }
-
 "use client";
 import { selectCurrentUser } from "@/redux/features/auth/authSlice";
 import { useAppSelector } from "@/redux/hook";
@@ -22,7 +10,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!user) {
-      router.push("/login");
+      router.push("/signin");
     }
   }, [user, router]);
 
@@ -30,5 +18,5 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     return null;
   }
 
-  return <>{children}</>;
+  return <div className="font-arimo">{children}</div>;
 }

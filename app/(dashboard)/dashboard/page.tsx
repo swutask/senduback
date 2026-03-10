@@ -1,15 +1,15 @@
 "use client";
 
-import AdminDash from "@/components/dashboard/dash-home/AdminDash";
-import BusinessDash from "@/components/dashboard/dash-home/BusinessDash";
+import AdminDash from "@/components/v2dashboard/dash-home/AdminDash";
+import { LostItemsPage } from "@/components/v2dashboard/lost-items/lost-items";
 import { UserRole } from "@/config/menuConfig";
-import { useAppSelector } from "@/redux/hook";
 import { selectCurrentUser } from "@/redux/features/auth/authSlice";
+import { useAppSelector } from "@/redux/hook";
 
 const Page = () => {
   const user = useAppSelector(selectCurrentUser);
 
-  if (!user) return null; // or loader
+  if (!user) return null;
 
   const role: UserRole = user.role;
 
@@ -18,7 +18,7 @@ const Page = () => {
   }
 
   if (role === "business") {
-    return <BusinessDash />;
+    return <LostItemsPage />;
   }
 
   return null;

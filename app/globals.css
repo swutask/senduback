@@ -3,10 +3,23 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* Custom breakpoints for devices */
+@theme {
+  --breakpoint-iphone14: 393px;
+  --breakpoint-iphone14max: 430px;
+  --breakpoint-pixel7: 480px;
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1536px;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-montserrat: var(--font-Montserrat);
+  --font-arimo: var(--font-Arimo);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -134,7 +147,7 @@
 }
 
 :root {
-  --radius: 4px;
+  --radius: 0.4rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -436,6 +449,66 @@ input[type="number"] {
 .jodit-wysiwyg a {
   color: revert;
   text-decoration: revert;
+}
+
+/* iPhone 14 Pro 393 x 852 = w-[370px] */
+/* iPhone 14 Pro Max 430 x 932 = w-[405px] */
+/* Pixel 7 Pro 480 x 1040 = w-[455px] */
+
+/* iPhone 14 Pro */
+@media (min-width: 393px) {
+  .responsive-container {
+    width: 370px;
+  }
+}
+
+/* iPhone 14 Pro Max */
+@media (min-width: 430px) {
+  .responsive-container {
+    width: 405px;
+  }
+}
+
+/* Pixel 7 Pro and above */
+@media (min-width: 480px) {
+  .responsive-container {
+    width: 455px;
+  }
+}
+
+/* Small tablets */
+@media (min-width: 640px) {
+  .responsive-container {
+    width: 540px;
+  }
+}
+
+/* Medium tablets */
+@media (min-width: 768px) {
+  .responsive-container {
+    width: 640px;
+  }
+}
+
+/* Laptops */
+@media (min-width: 1024px) {
+  .responsive-container {
+    width: 780px;
+  }
+}
+
+/* Desktops */
+@media (min-width: 1280px) {
+  .responsive-container {
+    width: 1024px;
+  }
+}
+
+/* Large desktops */
+@media (min-width: 1536px) {
+  .responsive-container {
+    width: 1280px;
+  }
 }
 
 @keyframes marquee {

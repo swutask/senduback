@@ -62,7 +62,7 @@ export default function ShippingPage() {
   const [totalCost, setTotalCost] = useState<number>(0);
   const [isRateSelected, setIsRateSelected] = useState<boolean>(false);
 
-  console.log(insuranceCost);
+  // console.log(insuranceCost);
 
   const [getShippingRates, { data, isLoading: shippingLoading }] =
     useGetShippingRatesMutation();
