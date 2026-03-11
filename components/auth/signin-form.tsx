@@ -160,7 +160,7 @@ export default function SigninForm() {
         <label className="text-sm font-semibold">Email Address *</label>
         <Input
           type="email"
-          placeholder="Reception@hotel.com"
+          placeholder="you@example.com"
           className="h-11 bg-gray-50 border-gray-200"
           disabled={isLoading}
           {...register("email", {

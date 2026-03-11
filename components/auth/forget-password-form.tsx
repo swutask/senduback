@@ -67,7 +67,7 @@ export default function ForgetPasswordForm() {
           <Input
             id="email"
             type="email"
-            placeholder="Reception@hotel.com"
+            placeholder="you@example.com"
             className="h-12 bg-gray-100 rounded-lg"
             {...register("email", {
               required: "Email is required",
