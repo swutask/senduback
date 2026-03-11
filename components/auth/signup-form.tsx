@@ -214,7 +214,7 @@ export function SignupForm() {
         <label className="text-sm font-semibold">Email Address *</label>
         <Input
           type="email"
-          placeholder="you@example.com"
+          placeholder="Reception@hotel.com"
           className="h-11 bg-gray-50 border-gray-200"
           disabled={isLoading}
           {...register("email", {
