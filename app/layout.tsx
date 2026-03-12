@@ -127,10 +127,6 @@ export const metadata: Metadata = {
     google: "X-5dLhfdV8e3G6hDwq44S6DxJcwQGMm0txIG7IBlm1c",
   },
 
-  icons: {
-    icon: [{ url: "/favicon.ico", sizes: "32x32", type: "image/x-icon" }],
-  },
-
   openGraph: {
     title: "SendUBack – Smart Lost & Found Made Simple",
     description:
@@ -175,7 +171,32 @@ export default function RootLayout({
           name="google-site-verification"
           content="X-5dLhfdV8e3G6hDwq44S6DxJcwQGMm0txIG7IBlm1c"
         />
-        <link rel="icon" href="/favicon.ico" sizes="any" />
+
+        <link rel="icon" href="/favicon.ico" sizes="32x32" />
+        <link rel="icon" href="/favicon-32x32.png" sizes="32x32" />
+        <link rel="icon" href="/favicon-16x16.png" sizes="16x16" />
+        <link
+          rel="apple-touch-icon"
+          href="/apple-touch-icon-57x57.png"
+          sizes="57x57"
+        />
+        <link
+          rel="apple-touch-icon"
+          href="/apple-touch-icon-114x114.png"
+          sizes="114x114"
+        />
+        <link
+          rel="apple-touch-icon"
+          href="/apple-touch-icon-120x120.png"
+          sizes="120x120"
+        />
+        <link
+          rel="apple-touch-icon"
+          href="/apple-touch-icon-180x180.png"
+          sizes="180x180"
+        />
+        <link rel="manifest" href="/site.webmanifest" />
+
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
