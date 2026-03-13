@@ -407,6 +407,16 @@ export default function LocationStep() {
               <ConfirmedView
                 key="confirmed"
                 onChange={() => {
+                  form.setValue("location", "");
+                  form.setValue("street1", "");
+                  form.setValue("city", "");
+                  form.setValue("country", "");
+                  form.setValue("state", "");
+                  form.setValue("postalCode", "");
+                  form.setValue("countryCode", "");
+                  form.setValue("placeName", "");
+                  form.setValue("businessName", "");
+
                   actions.setView("search");
                 }}
               />
