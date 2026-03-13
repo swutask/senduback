@@ -436,10 +436,15 @@ export default function ItemDetailsStep() {
 
   const handleEdit = (item: SelectedItem, index: number) => {
     const cat =
-      CATEGORIES.find((c) => c.name === item.category) ?? CATEGORIES[0];
+      CATEGORIES.find(
+        (c) =>
+          c.name.trim().toLowerCase() === item.category.trim().toLowerCase(),
+      ) ?? CATEGORIES[0];
     const sub =
-      cat.subcategories.find((c) => c.name === item.subcategory) ??
-      cat.subcategories[0];
+      cat.subcategories.find(
+        (c) =>
+          c.name.trim().toLowerCase() === item.subcategory.trim().toLowerCase(),
+      ) ?? cat.subcategories[0];
     setSelectedCategory(cat);
     setSelectedSubcategory(sub);
     setEditingItem(item);
@@ -449,9 +454,14 @@ export default function ItemDetailsStep() {
 
   const handleDelete = (index: number) => {
     const currentItems = selectedItems || [];
+
     const updated = currentItems.filter((_, i) => i !== index);
     form.setValue("selectedItems", updated);
-    if (updated.length === 0) actions.setView("category");
+
+    if (updated.length === 0) {
+      actions.goToStep("item-details");
+      actions.setView("category");
+    }
   };
 
   return (

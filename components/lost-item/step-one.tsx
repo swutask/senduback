@@ -296,6 +296,7 @@ export function SearchView({ onManual }: { onManual: () => void }) {
     setValue("countryCode", loc.countryCode);
     setValue("placeName", loc.name);
     setShowSuggestions(false);
+
     actions.setView("confirmed");
   };
 
@@ -355,11 +356,13 @@ export function SearchView({ onManual }: { onManual: () => void }) {
 export default function LocationStep() {
   const { form, state, actions } = useLostItemForm();
 
+  const selectedItems = form.watch("selectedItems");
+
   const handleNextStep = async () => {
     const isValid = await canProceed(state, form);
     if (!isValid) return;
 
-    if (form.watch("selectedItems").length) {
+    if (selectedItems.length) {
       actions.goToStep("item-details");
       actions.setView("item-list");
       return;
@@ -404,7 +407,6 @@ export default function LocationStep() {
               <ConfirmedView
                 key="confirmed"
                 onChange={() => {
-                  form.reset();
                   actions.setView("search");
                 }}
               />

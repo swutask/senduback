@@ -1,6 +1,8 @@
 "use client";
 
+import { useGetLostItemQuery } from "@/redux/features/shipping/shippingApi";
 import { StaticImport } from "next/dist/shared/lib/get-img-props";
+import { useParams } from "next/navigation";
 
 import {
   createContext,
@@ -8,6 +10,7 @@ import {
   useReducer,
   useCallback,
   type ReactNode,
+  useEffect,
 } from "react";
 import { useForm, UseFormReturn } from "react-hook-form";
 
@@ -61,7 +64,7 @@ const STEP_ALLOWED_VIEWS: Record<FormStep, ViewState[]> = {
 function getDefaultView(step: FormStep): ViewState {
   return STEP_ALLOWED_VIEWS[step][0];
 }
-0;
+
 function isViewAllowed(step: FormStep, view: ViewState) {
   return STEP_ALLOWED_VIEWS[step].includes(view);
 }
@@ -201,6 +204,8 @@ export function LostItemProvider({ children }: { children: ReactNode }) {
     },
   });
 
+  const { setValue, watch } = form;
+
   const actions: LostItemContextValue["actions"] = {
     nextStep: useCallback(() => dispatch({ type: "NEXT_STEP" }), []),
     prevStep: useCallback(() => dispatch({ type: "PREV_STEP" }), []),
@@ -217,6 +222,66 @@ export function LostItemProvider({ children }: { children: ReactNode }) {
       [],
     ),
   };
+
+  // ** pre-fill the data, for existing order
+
+  const params = useParams();
+  const itemTypesId = (params.id as string)?.toLowerCase();
+  const selectedItems = watch("selectedItems");
+
+  const { data: lostItemData, isLoading: isLostItemLoading } =
+    useGetLostItemQuery(itemTypesId);
+
+  useEffect(() => {
+    if (isLostItemLoading || !lostItemData?.data) return;
+
+    const mainData = lostItemData.data;
+    const userData = lostItemData.data.user;
+    const businessData = userData?.businessDetails;
+
+    if (userData?.email) setValue("email", userData.email);
+
+    if (businessData?.telephone) {
+      setValue("phone", businessData.telephone);
+    }
+    if (businessData?.businessName)
+      setValue("businessName", businessData.businessName);
+
+    // Set item fields (Orders section)
+    if (mainData && selectedItems.length === 0) {
+      const newItem = {
+        name: mainData.itemName || "Lost Item",
+        category: mainData.itemCategory || "Others",
+        subcategory: mainData.itemSubcategory || "Others",
+        description: mainData.itemDescription || "",
+      };
+
+      setValue("selectedItems", [newItem]);
+    }
+
+    if (businessData) {
+      const formattedAddress = [
+        businessData.addressLine1,
+        businessData.city,
+        businessData.state,
+        businessData.country,
+        businessData.postcode,
+      ]
+        .filter(Boolean)
+        .join(", ");
+
+      setValue("location", formattedAddress);
+      setValue("street1", businessData.addressLine1 || "");
+      setValue("city", businessData.city || "");
+      setValue("country", businessData.country || "");
+      setValue("state", businessData.state || "");
+      setValue("postalCode", businessData.postcode || "");
+      setValue("countryCode", businessData.countryCode || "");
+      setValue("placeName", mainData.locationFound || "");
+    }
+
+    actions.goToStep("delivery");
+  }, [lostItemData, isLostItemLoading, setValue]);
 
   return (
     <LostItemContext.Provider value={{ state, dispatch, actions, form }}>
