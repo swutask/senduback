@@ -307,7 +307,7 @@ export function SearchView({ onManual }: { onManual: () => void }) {
       exit="exit"
     >
       <div className="relative">
-        
+
         <SearchBar
           {...form.register("location")}
           placeholder={animatedPlaceholder}
@@ -332,10 +332,10 @@ export function SearchView({ onManual }: { onManual: () => void }) {
                   >
                     <MapPin className="w-4 h-4 text-slate-400 shrink-0" />
                     <span className="text-sm text-slate-700">
-                      {item.name} {item.city ? `${item.city}, ` : ""}
-                      {item.state ? `${item.state} ` : ""}
-                      {item.postal_code ? `${item.postal_code}, ` : ""}
-                      {item.country ? item.country : ""}
+                      {item?.name} {item?.city ? `${item.city}, ` : ""}
+                      {item?.state ? `${item.state} ` : ""}
+                      {item?.postal_code ? `${item.postal_code}, ` : ""}
+                      {item?.country ? item.country : ""}
                     </span>
                   </li>
                 ))}
