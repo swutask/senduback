@@ -314,7 +314,12 @@ function AddressSelectView({ onSelect }: { onSelect: () => void }) {
                     className="flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-slate-50 transition-colors"
                   >
                     <MapPin className="w-4 h-4 text-slate-400 shrink-0" />
-                    <span className="text-sm text-slate-700">{item.name}</span>
+                    <span className="text-sm text-slate-700">
+                      {item.name} {item.city ? `${item.city}, ` : ""}
+                      {item.state ? `${item.state} ` : ""}
+                      {item.postal_code ? `${item.postal_code}, ` : ""}
+                      {item.country ? item.country : ""}
+                    </span>
                   </li>
                 ))}
               </ul>

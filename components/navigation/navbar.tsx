@@ -389,7 +389,7 @@ export function MobileMenu({
         <div className="fixed inset-0 bg-black/40 z-40" onClick={close} />
       )}
       <div
-        className={`fixed top-0 right-0 h-screen w-80 bg-white z-50 transform transition-transform duration-300 ease-in-out flex flex-col
+        className={`fixed top-0 right-0 h-full w-80 bg-white z-50 transform transition-transform duration-300 ease-in-out flex flex-col
         ${isMobileMenuOpen ? "translate-x-0" : "translate-x-full"}`}
         style={{
           boxShadow: "0px 30px 70px rgba(0, 150, 255, 0.25)",
@@ -483,13 +483,26 @@ export function MobileMenu({
               </Link>
             </div>
           ) : (
-            <Button
-              onClick={handleLogout}
-              variant="outline"
-              className="w-full text-red-600"
-            >
-              Logout
-            </Button>
+            <div className="flex flex-col gap-3">
+              <Link
+                href="/dashboard"
+                onClick={close}
+                className={cn(
+                  "font-semibold flex justify-center items-center hover:opacity-90 transition",
+                  "bg-transparent text-primary-new border border-primary-new",
+                  "h-12 rounded-md opacity-100 text-center",
+                )}
+              >
+                Dashboard
+              </Link>
+              <Button
+                onClick={handleLogout}
+                variant="outline"
+                className="w-full text-red-600"
+              >
+                Logout
+              </Button>
+            </div>
           )}
         </div>
       </div>
