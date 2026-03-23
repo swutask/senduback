@@ -307,9 +307,9 @@ function AddressSelectView({ onSelect }: { onSelect: () => void }) {
               </div>
             ) : addressData?.length ? (
               <ul>
-                {addressData.map((item: any) => (
+                {addressData.map((item: any, index:number) => (
                   <li
-                    key={item.id}
+                    key={`${item.id}-${index}`}
                     onMouseDown={() => handleSuggestionSelect(item)}
                     className="flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-slate-50 transition-colors"
                   >
