@@ -307,6 +307,7 @@ export function SearchView({ onManual }: { onManual: () => void }) {
       exit="exit"
     >
       <div className="relative">
+        
         <SearchBar
           {...form.register("location")}
           placeholder={animatedPlaceholder}
