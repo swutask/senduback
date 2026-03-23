@@ -309,7 +309,7 @@ function AddressSelectView({ onSelect }: { onSelect: () => void }) {
               <ul>
                 {addressData.map((item: any, index:number) => (
                   <li
-                    key={`${item.id}-${index}`}
+                    key={`${item.street1}-${index}`}
                     onMouseDown={() => handleSuggestionSelect(item)}
                     className="flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-slate-50 transition-colors"
                   >
