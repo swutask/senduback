@@ -1,13 +1,12 @@
 "use client";
 
-import { useParams } from "next/navigation";
 import { blogPosts } from "@/lib/blog-data";
-import { ArrowLeft } from "lucide-react";
-import Link from "next/link";
-import Image from "next/image";
 import { cn } from "@/lib/utils";
-import SubscribeNewsletter from "@/components/blog/subscribe-newsletter";
 import { motion, type Variants } from "framer-motion";
+import { ArrowLeft } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { useParams } from "next/navigation";
 
 const containerVariants: Variants = {
   hidden: { opacity: 0 },

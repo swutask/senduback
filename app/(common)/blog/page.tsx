@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
 import BlogHero from "@/components/blog/blog-hero";
-import FeaturedBlog from "@/components/blog/featured-blog";
 import BlogPosts from "@/components/blog/blog-posts";
+import FeaturedBlog from "@/components/blog/featured-blog";
 import SubscribeNewsletter from "@/components/blog/subscribe-newsletter";
+import { useState } from "react";
 
 export default function BlogPage() {
   const [selectedCategory, setSelectedCategory] = useState("All");

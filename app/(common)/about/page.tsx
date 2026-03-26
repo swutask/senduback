@@ -1,6 +1,6 @@
 import AboutHeroSection from "@/components/about-us/about-hero-section";
-import WeCare from "@/components/about-us/we-care";
 import OurMissionSection from "@/components/about-us/our-mission-section";
+import WeCare from "@/components/about-us/we-care";
 import WhoIsThis from "@/components/about-us/who-is-this";
 import WhyItWorks from "@/components/about-us/why-it-works";
 import AboutCTASection from "@/components/common/about-cta-section";

@@ -52,7 +52,6 @@ export default function page() {
         <GetStarted />
       </div>
 
-      {/* <LostAndFoundSection /> */}
     </div>
   );
 }
