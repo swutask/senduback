@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -12,10 +12,14 @@ import {
   Phone,
   Image as ImageIcon,
   X,
+  CloudCog,
 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { useUpdateUserProfileMutation } from "@/redux/features/user/userApi";
+import {
+  useGetCurrentUserQuery,
+  useUpdateUserProfileMutation,
+} from "@/redux/features/user/userApi";
 import { useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { selectAccessToken, setUser } from "@/redux/features/auth/authSlice";
@@ -35,8 +39,13 @@ export function BusinessDetailsForm() {
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<BusinessDetailsFormValues>();
+
+  const { data } = useGetCurrentUserQuery({});
+
+  console.log(data?.data);
 
   const [updateUserProfile, { isLoading }] = useUpdateUserProfileMutation();
   const router = useRouter();
@@ -44,6 +53,13 @@ export function BusinessDetailsForm() {
   const currentToken = useAppSelector(selectAccessToken);
 
   const [images, setImages] = useState<File[]>([]);
+
+  useEffect(() => {
+    if (data?.data) {
+      setValue("businessName", data.data.firstName || "");
+      setValue("email", data.data.email || "");
+    }
+  }, [data, setValue]);
 
   const onSubmit = async (data: BusinessDetailsFormValues) => {
     try {

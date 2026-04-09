@@ -2,6 +2,7 @@
 
 import { Download, Search, X } from "lucide-react";
 import { useState } from "react";
+import Swal from "sweetalert2";
 
 import {
   Table,
@@ -23,7 +24,10 @@ import {
 } from "@/components/ui/select";
 import { BusinessDetailView } from "@/lib/modal/business-betail-view";
 import { BusinessItemsView } from "@/lib/modal/BusinessItemsView";
-import { useGetUsersByRoleQuery } from "@/redux/features/user/userApi";
+import {
+  useDeleteUserMutation,
+  useGetUsersByRoleQuery,
+} from "@/redux/features/user/userApi";
 import Link from "next/link";
 
 export default function Businesses() {
@@ -47,6 +51,39 @@ export default function Businesses() {
     page: currentPage,
     limit: rowsPerPage,
   });
+
+  const [deleteUser] = useDeleteUserMutation();
+
+  const handleDeleteBusiness = async (id: string) => {
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "This business will be permanently deleted.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    });
+
+    if (!result.isConfirmed) {
+      return;
+    }
+
+    try {
+      await deleteUser(id).unwrap();
+      await Swal.fire({
+        title: "Deleted!",
+        text: "The business has been deleted.",
+        icon: "success",
+      });
+    } catch (err: any) {
+      await Swal.fire({
+        title: "Error!",
+        text: err?.data?.message || "Failed to delete the business.",
+        icon: "error",
+      });
+    }
+  };
 
   console.log(data);
 
@@ -291,6 +328,13 @@ export default function Businesses() {
                             Manage
                           </Button>
                         </Link>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={() => handleDeleteBusiness(b._id)}
+                        >
+                          Delete
+                        </Button>
                       </div>
                     </TableCell>
                   </TableRow>
