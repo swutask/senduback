@@ -86,6 +86,7 @@ import { ReduxProvider } from "@/redux/ReduxProvider";
 import GlobalLoader from "@/components/shared/global-loader";
 import Script from "next/script";
 import type { Metadata } from "next";
+import CookieBanner from "@/components/cookie/cookie-banner";
 
 const montserrat = Montserrat({
   variable: "--font-Montserrat",
@@ -153,10 +154,6 @@ export const metadata: Metadata = {
   },
 
   robots: "index, follow",
-
-  alternates: {
-    canonical: "https://senduback.com/",
-  },
 };
 
 export default function RootLayout({
@@ -214,6 +211,11 @@ export default function RootLayout({
         <ReduxProvider>
           <GlobalLoader>{children}</GlobalLoader>
         </ReduxProvider>
+
+        <CookieBanner
+          cookiePolicyHref="/cookie-policy"
+          privacyPolicyHref="/privacy-policy"
+        />
 
         {/* Google Maps */}
         <Script

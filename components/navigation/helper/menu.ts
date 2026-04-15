@@ -100,7 +100,7 @@ export function getMenuData(key: MenuKey): MenuColumn[] {
             { label: "Terms of Service", href: "/terms-conditions" },
             { label: "Privacy Policy", href: "/privacy-policy" },
             { label: "Refund Policy", href: "/refund-policy" },
-            { label: "Cookie Policy" },
+            { label: "Cookie Policy", href: "/cookie-policy" },
           ],
         },
       ];

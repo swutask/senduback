@@ -8,6 +8,13 @@ import WhyChoose from "@/components/common/why-chooses";
 import WorksForBusinesses from "@/components/common/works-for-businesses";
 import { HowItWorksGuests } from "@/components/common/how-it-works-guests";
 import HashScrollHandler from "@/components/common/scroll-handler";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  alternates: {
+    canonical: "https://senduback.com/",
+  },
+};
 
 export default function page() {
   return (
