@@ -155,24 +155,6 @@ export default function PendingOrdersPage() {
     setBusinessSearch("");
   };
 
-  // Get selected business name
-  // const getSelectedBusinessName = () => {
-  //   if (businessFilter === "all") return "Business";
-  //   const selectedBusiness = businessUsers.find(
-  //     (business: any) => business._id === businessFilter,
-  //   );
-  //   return selectedBusiness?.businessName || "Business";
-  // };
-
-  // const handleOpenLabelModal = (shipment: any) => {
-  //   setSelectedShipmentForLabel(shipment);
-  //   setShippingLabelFile(null);
-  //   setTrackingId(shipment.tracking_id || "");
-  //   setTrackingUrl(shipment.tracking_url || "");
-  //   setCarrier(shipment.carrier || "");
-  //   setShowLabelModal(true);
-  // };
-
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setShippingLabelFile(e.target.files[0]);
@@ -252,136 +234,6 @@ export default function PendingOrdersPage() {
           />
         </div>
       </div>
-
-      {/* Filters  */}
-      {/* <div className="bg-white rounded-xl shadow-sm border border-gray-100 mb-6 p-4">
-        <div className="flex flex-wrap items-center gap-3">
-          <DropdownMenu open={showDateRange} onOpenChange={setShowDateRange}>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="gap-2">
-                📅{" "}
-                {dateRange.from && dateRange.to
-                  ? `${dateRange.from} to ${dateRange.to}`
-                  : "Date Range"}
-                <Calendar className="w-4 h-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-64 p-4" align="start">
-              <div className="space-y-3">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    From
-                  </label>
-                  <input
-                    type="date"
-                    value={dateRange.from}
-                    onChange={(e) =>
-                      setDateRange({ ...dateRange, from: e.target.value })
-                    }
-                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    To
-                  </label>
-                  <input
-                    type="date"
-                    value={dateRange.to}
-                    onChange={(e) =>
-                      setDateRange({ ...dateRange, to: e.target.value })
-                    }
-                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-                  />
-                </div>
-                <div className="flex gap-2 pt-2">
-                  <Button
-                    size="sm"
-                    className="flex-1"
-                    onClick={() => {
-                      handleDateRangeApply();
-                      setShowDateRange(false);
-                    }}
-                    disabled={!dateRange.from || !dateRange.to}
-                  >
-                    Apply
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="flex-1"
-                    onClick={() => {
-                      setDateRange({ from: "", to: "" });
-                      setCurrentPage(1);
-                    }}
-                  >
-                    Clear
-                  </Button>
-                </div>
-              </div>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          <DropdownMenu
-            open={showBusinessDropdown}
-            onOpenChange={setShowBusinessDropdown}
-          >
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="gap-2">
-                🏢 {getSelectedBusinessName()}{" "}
-                <ChevronDown className="w-4 h-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-64">
-              <div className="p-2">
-                <Input
-                  placeholder="Search business..."
-                  value={businessSearch}
-                  onChange={(e) => setBusinessSearch(e.target.value)}
-                  className="mb-2"
-                  onFocus={(e) => e.stopPropagation()}
-                />
-                <div className="max-h-60 overflow-y-auto">
-                  <DropdownMenuItem
-                    onClick={() => {
-                      setBusinessFilter("all");
-                      setBusinessSearch("");
-                      setCurrentPage(1);
-                      setShowBusinessDropdown(false);
-                    }}
-                    className={businessFilter === "all" ? "bg-blue-50" : ""}
-                  >
-                    All Businesses
-                  </DropdownMenuItem>
-                  {businessUsers.map((business: any) => (
-                    <DropdownMenuItem
-                      key={business._id}
-                      onClick={() => {
-                        setBusinessFilter(business._id);
-                        setBusinessSearch("");
-                        setCurrentPage(1);
-                        setShowBusinessDropdown(false);
-                      }}
-                      className={
-                        businessFilter === business._id ? "bg-blue-50" : ""
-                      }
-                    >
-                      {business.businessName}
-                    </DropdownMenuItem>
-                  ))}
-                </div>
-              </div>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          <button
-            onClick={clearFilters}
-            className="text-sm text-blue-600 hover:text-blue-700 font-medium ml-auto"
-          >
-            Clear Filters
-          </button>
-        </div>
-      </div> */}
 
       {/* Table */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100">
@@ -466,18 +318,6 @@ export default function PendingOrdersPage() {
 
                       {/* Business */}
                       <TableCell>
-                        {/* <div className="font-medium text-gray-900 group/business-name relative">
-                          <span className="truncate max-w-[120px] inline-block">
-                            {business?.businessDetails?.businessName ||
-                              business?.firstName + " " + business?.lastName ||
-                              shipment.address_from?.email}
-                          </span>
-                          <div className="absolute bottom-full left-0 mb-1 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 invisible group-hover/business-name:opacity-100 group-hover/business-name:visible transition-all duration-200 whitespace-nowrap z-10 shadow-lg">
-                            {business?.businessDetails?.businessName ||
-                              business?.firstName + " " + business?.lastName ||
-                              shipment.address_from?.email}
-                          </div>
-                        </div> */}
                         <div className="font-medium text-gray-900 group/business-name relative">
                           <span className="truncate max-w-[120px] inline-block">
                             {shipment.address_from?.hotelName ||
@@ -542,8 +382,6 @@ export default function PendingOrdersPage() {
                         </div>
                       </TableCell>
 
-                      {/* Shipping Label Status
-                                            <TableCell>{getLabelStatus(shipment) === "Uploaded" ? <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">✓ Uploaded</span> : <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-700">⚠️ Waiting for label</span>}</TableCell> */}
                       <TableCell>
                         <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-700">
                           {shipment.status}
@@ -559,59 +397,6 @@ export default function PendingOrdersPage() {
                           >
                             View
                           </Button>
-
-                          {/* <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="icon">
-                                <ChevronDown className="w-4 h-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="w-64">
-                              <DropdownMenuItem
-                                onClick={() => handleOpenLabelModal(shipment)}
-                                className="gap-2"
-                              >
-                                <Upload className="w-4 h-4" />
-                                Upload / Replace shipping label
-                              </DropdownMenuItem>
-
-                              {shipment.shippingLabel && (
-                                <DropdownMenuItem
-                                  onClick={async () => {
-                                    try {
-                                      const response = await fetch(
-                                        `${process.env.NEXT_PUBLIC_BASEURL}${shipment.shippingLabel}`,
-                                      );
-                                      const blob = await response.blob();
-                                      const url =
-                                        window.URL.createObjectURL(blob);
-                                      const a = document.createElement("a");
-                                      a.href = url;
-                                      a.download = "shipping-label.png";
-                                      a.click();
-                                      window.URL.revokeObjectURL(url);
-                                    } catch (error) {
-                                      console.error("Download failed:", error);
-                                    }
-                                  }}
-                                  className="gap-2"
-                                >
-                                  <Download className="w-4 h-4" />
-                                  Download label
-                                </DropdownMenuItem>
-                              )}
-
-                              <DropdownMenuItem className="gap-2">
-                                <Mail className="w-4 h-4" />
-                                Resend order confirmation / tracking email
-                              </DropdownMenuItem>
-
-                              <DropdownMenuItem className="gap-2">
-                                <ArrowRight className="w-4 h-4" />
-                                Move to Shipments
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu> */}
                         </div>
                       </TableCell>
                     </TableRow>

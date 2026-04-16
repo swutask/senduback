@@ -3,7 +3,6 @@ import Image from "next/image";
 
 const page = () => {
   return (
-    // <AuthLayout>
     <div
       className="min-h-screen flex items-center justify-center p-2 md:p-4"
       style={{ background: "linear-gradient(0deg, #092F60 0%, #092F60 100%)" }}
@@ -28,8 +27,6 @@ const page = () => {
         </p>
       </div>
     </div>
-
-    // </AuthLayout>
   );
 };
 

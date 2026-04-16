@@ -43,13 +43,11 @@ export default function CollectedPage() {
   const [page, setPage] = useState(1);
   const limit = 10;
 
-  const { data, isLoading, isError, error } = useGetLostItemsQuery({
+  const { data, isLoading } = useGetLostItemsQuery({
     status: LOST_ITEM_STATUS.COLLECTED,
     page,
     limit,
   });
-
-  // console.log(" collected",data);
 
   const lostItems = data?.data?.lostItems || [];
   const meta = data?.data?.meta;

@@ -10,9 +10,8 @@ export default function Loading() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setShow(false);
-    }, 1000); // 1000ms = 1 second
+    }, 1000);
 
-    // Cleanup timer on unmount
     return () => clearTimeout(timer);
   }, []);
 
