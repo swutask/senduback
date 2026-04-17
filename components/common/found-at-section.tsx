@@ -23,15 +23,15 @@ import Image from "next/image";
 const CATEGORIES: Category[] = [
   { id: "1", key: "hotel", label: "Hotel", icon: hotel },
   { id: "2", key: "airport", label: "Airport", icon: airport },
-  { id: "3", key: "carRental", label: "Car Rental", icon: rentCar },
+  { id: "3", key: "car-rental", label: "Car Rental", icon: rentCar },
   { id: "4", key: "ship", label: "Ship", icon: ship },
   { id: "5", key: "airbnb", label: "Airbnb", icon: airbnb },
   { id: "6", key: "hospital", label: "Hospital", icon: hospital },
-  { id: "7", key: "travelAgency", label: "Travel", icon: travelAgency },
+  { id: "7", key: "travel-agency", label: "Travel", icon: travelAgency },
   { id: "8", key: "event", label: "Event", icon: event },
   { id: "9", key: "museum", label: "Museum", icon: museum },
-  { id: "10", key: "intercityBus", label: "Bus", icon: intercityBus },
-  { id: "11", key: "trainStation", label: "Train", icon: trainStation },
+  { id: "10", key: "intercity-bus", label: "Bus", icon: intercityBus },
+  { id: "11", key: "train-station", label: "Train", icon: trainStation },
   { id: "12", key: "stadium", label: "Stadium", icon: stadiumIcon },
 ];
 

@@ -135,16 +135,33 @@ export function AccordionNavItem({
   menuKey,
   href,
   onClose,
+  type = "nested",
 }: {
   label: string;
   menuKey: MenuKey;
   href?: string;
   onClose: () => void;
+  type?: "default" | "nested"; // ** default for single links and nested for accordian based links
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const columns = getMenuData(menuKey);
 
   const allLinks = columns?.flatMap((col: any) => col.items ?? col) ?? [];
+
+  if (type === "default") {
+    return (
+      <Link
+        href={href ?? "#"}
+        onClick={onClose}
+        className={cn(
+          "flex items-start gap-3 py-2.5 rounded-lg hover:bg-slate-50 transition group",
+          "text-primary-new hover:bg-gray-50 font-semibold",
+        )}
+      >
+        {label}
+      </Link>
+    );
+  }
 
   return (
     <div className="border-b border-slate-100 last:border-b-0">

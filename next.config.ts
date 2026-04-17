@@ -28,6 +28,22 @@ const nextConfig: NextConfig = {
     ],
     unoptimized: true,
   },
+
+  async redirects() {
+    return [
+      {
+        source: "/:path*",
+        has: [
+          {
+            type: "host",
+            value: "www.senduback.com",
+          },
+        ],
+        destination: "https://senduback.com/:path*",
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;

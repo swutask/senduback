@@ -60,6 +60,8 @@ export default function Header() {
     setIsMobileMenuOpen(false);
   };
 
+  const defualtNavLinks = ["/send-you-back"];
+
   const NavItem = ({
     label,
     menuKey,
@@ -69,6 +71,8 @@ export default function Header() {
     menuKey: MenuKey;
     href?: string;
   }) => {
+    const isDefaultItem = defualtNavLinks.some((l) => l === href.trim());
+
     const handleEnter = () => {
       if (closeTimeout.current) clearTimeout(closeTimeout.current);
       setOpenMenu(menuKey);
@@ -92,11 +96,11 @@ export default function Header() {
           href={href}
           className={cn(
             "text-primary-new font-semibold flex items-center gap-1",
-            isActive && "text-active",
+            isActive && !isDefaultItem && "text-active",
           )}
         >
           {label}
-          <span className="text-xs">▼</span>
+          {!isDefaultItem && <span className="text-xs">▼</span>}
         </Link>
 
         <Menu
@@ -171,6 +175,11 @@ export default function Header() {
             <NavItem label="For Hotels" menuKey="hotels" href="/for-hotels" />
             <NavItem label="Help" menuKey="help" />
             <NavItem label="Legal" menuKey="legal" />
+            <NavItem
+              label="Send You Back"
+              menuKey={null}
+              href="/send-you-back"
+            />
           </div>
 
           {isOrdersPage ? (
@@ -376,11 +385,18 @@ export function MobileMenu({
     label: string;
     menuKey: MenuKey;
     href?: string;
+    type?: "default" | "nested"; // ** default for single links and nested for accordian based links
   }[] = [
     { label: "For Guests", menuKey: "guests", href: "/for-guests" },
     { label: "For Hotels", menuKey: "hotels", href: "/for-hotels" },
     { label: "Help", menuKey: "help" },
     { label: "Legal", menuKey: "legal" },
+    {
+      label: "Send You Back",
+      menuKey: null,
+      href: "/send-you-back",
+      type: "default",
+    },
   ];
 
   return (
@@ -451,6 +467,7 @@ export function MobileMenu({
                 menuKey={item.menuKey}
                 href={item.href}
                 onClose={close}
+                type={item.type}
               />
             ))}
           </div>

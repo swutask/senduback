@@ -8,7 +8,9 @@ import SupportButton from "@/components/shared/support-button";
 export default function layout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const hideFooter =
-    pathname.includes("/orders") || pathname.includes("/payments");
+    pathname.includes("/orders") ||
+    pathname.includes("/payments") ||
+    pathname === "/send-you-back";
   return (
     <div className="">
       <Header />

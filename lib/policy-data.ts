@@ -334,9 +334,6 @@ const PRIVACY_POLICY_SECTIONS: PolicySection[] = [
   },
 ];
 
-// ─── Add this to your existing policy-data.ts ────────────────────────────────
-// Replace the existing POLICY_DATA export with the one at the bottom of this file.
-
 const COOKIE_TABLE_STYLES = `
   <style>
     .cookie-table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 13px; }

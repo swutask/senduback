@@ -37,7 +37,7 @@ interface CookiePreferencesProps {
   privacyPolicyHref?: string;
 }
 
-const targetRoutes = ["/"];
+const targetRoutes = ["/dashboard"];
 
 export default function CookiePreferences({
   forceVisible = false,
@@ -72,7 +72,7 @@ export default function CookiePreferences({
     dismiss("rejected");
   };
 
-  if (!targetRoutes.includes(pathname)) return null;
+  if (targetRoutes.some(r => pathname.startsWith(r))) return null;
 
   return (
     <AnimatePresence>
