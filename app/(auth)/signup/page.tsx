@@ -1,7 +1,9 @@
 "use client";
 
-import { SignupForm } from "@/components/auth/signup-form";
+import { cn } from "@/lib/utils";
 import Image from "next/image";
+import Link from "next/link";
+import { motion } from "framer-motion";
 
 export default function SignupPage() {
   return (
@@ -21,17 +23,38 @@ export default function SignupPage() {
           />
         </div>
 
-        {/* Form Header */}
-        <div className="mb-2 text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-1">
-            Create your account
+        <div className="mb-2 text-center mt-4">
+          <h2 className="text-2xl font-bold text-gray-900 mb-5">
+            We're upgrading your experience
           </h2>
-          <p className="text-gray-600 text-sm">
-            Get started with our platform today
+          <p className="text-gray-600 text-sm mb-2">
+            We're currently enhancing SendUBack with new features for hotels.
           </p>
+          <p className="text-gray-600 text-sm mb-2">
+            Hotel registrations are temporarily paused while we complete these
+            improvements.
+          </p>
+          <p className="text-gray-600 text-sm mb-5">
+            If you'd like early access or a quick demo, our team would be happy
+            to assist.
+          </p>
+          <Link
+            href="/contact"
+            className="inline-block text-white px-6 py-3 font-semibold"
+          >
+            <motion.button
+              whileHover={{ scale: 1.03, transition: { duration: 0.18 } }}
+              whileTap={{ scale: 0.97 }}
+              className={cn(
+                "flex items-center justify-center gap-2 font-semibold text-white rounded-xl",
+                "bg-gradient-to-r from-[#0099FF] to-[#000080]",
+                "px-8 py-4 text-[15px]",
+              )}
+            >
+              Contact Us
+            </motion.button>
+          </Link>
         </div>
-        {/* Form */}
-        <SignupForm />
       </div>
     </div>
 
